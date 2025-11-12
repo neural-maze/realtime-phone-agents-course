@@ -106,7 +106,7 @@ Here’s what the upcoming weeks look like 👇
 
 | Lesson Number | Title | Article | Code | Live Session |
 |---------------|----------------|--------------|--------------|-------------|
-| <div align="center">0</div> | Project overview and architecture | November 12 | <div align="center">-</div> | November 16|
+| <div align="center">0</div> | <a href="https://theneuralmaze.substack.com/p/the-architecture-of-realtime-phone">Project overview and architecture</a> | <a href="https://theneuralmaze.substack.com/p/the-architecture-of-realtime-phone"><img src="static/diagrams/diagram_lesson_0.png" alt="Diagram 0" width="300"></a> | <div align="center">-</div> | <a href="https://www.youtube.com/live/SH91HMlKpOQ">November 16</a> |
 | <div align="center">1</div> | Building Voice Agents with FastRTC | November 19 | November 19 | November 23 |
 | <div align="center">2</div> | Superlinked for Realtime Property Search | November 26 | November 26 | November 30 |
 | <div align="center">3</div> | Improving STT and TTS Systems | December 3 | December 3 | December 7 |
