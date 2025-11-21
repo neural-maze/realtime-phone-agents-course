@@ -1,12 +1,12 @@
 <div align="center">
-  <h1>☎️ Phone Agents Course ☎️</h1>
-  <h3>Realtime AI voice agents with FastRTC, Superlinked, Twilio, Opik and Runpod</h3>
+  <h1>☎️ Phone Calling Agents Course ☎️</h1>
+  <h3>How to build an Agent Call Center using FastRTC, Superlinked, Twilio, Opik & RunPod</h3>
 </div>
 
 </br>
 
 <p align="center">
-    <img src="static/diagrams/system_architecture.png" alt="Architecture" width="600">
+    <img src="static/main_gh_image.png" alt="Architecture" width="600">
 </p>
 
 
@@ -16,6 +16,9 @@
 - [Course Overview](#course-overview)
 - [Who is this course for?](#who-is-this-course-for)
 - [Course Breakdown: Week by Week](#course-breakdown-week-by-week)
+- [Getting Started](#getting-started)
+- [Lesson 0: Project Overview and Architecture](#lesson-0-project-overview-and-architecture)
+- [Lesson 1: Building Realtime Voice Agents with FastRTC](#lesson-1-building-realtime-voice-agents-with-fastrtc)
 - [The tech stack](#the-tech-stack)
 - [Contributors](#contributors)
 - [License](#license)
@@ -105,12 +108,92 @@ Here’s what the upcoming weeks look like 👇
 
 
 | Lesson Number | Title | Article | Code | Live Session |
-|---------------|----------------|--------------|--------------|-------------|
-| <div align="center">0</div> | <a href="https://theneuralmaze.substack.com/p/the-architecture-of-realtime-phone">Project overview and architecture</a> | <a href="https://theneuralmaze.substack.com/p/the-architecture-of-realtime-phone"><img src="static/diagrams/diagram_lesson_0.png" alt="Diagram 0" width="300"></a> | <div align="center">-</div> | <a href="https://www.youtube.com/live/SH91HMlKpOQ">November 16</a> |
-| <div align="center">1</div> | Building Voice Agents with FastRTC | November 19 | November 19 | November 23 |
+|:-------------:|:--------------:|:------------:|:------------:|:-----------:|
+| <div align="center">0</div> | <a href="https://theneuralmaze.substack.com/p/the-architecture-of-realtime-phone">Project overview and architecture</a> | <a href="https://theneuralmaze.substack.com/p/the-architecture-of-realtime-phone"><img src="static/diagrams/diagram_lesson_0.png" alt="Diagram 0" width="300"></a> | <a href="https://github.com/neural-maze/realtime-phone-agents-course/tree/week0">Week 0</a> | <a href="https://theneuralmaze.substack.com/p/the-architecture-of-phone-calling"><img src="static/thumbnails/live_session_0.png" alt="Thumbnail 0" width="400"></a> |
+| <div align="center">1</div> | <a href="https://theneuralmaze.substack.com/p/building-realtime-voice-agents-with">Building Realtime Voice Agents with FastRTC</a> | <a href="https://theneuralmaze.substack.com/p/building-realtime-voice-agents-with"><img src="static/diagrams/diagram_lesson_1.png" alt="Diagram 1" width="300"></a> | <a href="https://github.com/neural-maze/realtime-phone-agents-course/tree/week1">Week 1</a> | November 23 |
 | <div align="center">2</div> | Superlinked for Realtime Property Search | November 26 | November 26 | November 30 |
 | <div align="center">3</div> | Improving STT and TTS Systems | December 3 | December 3 | December 7 |
 | <div align="center">4</div> | Deployment, monitoring and Twilio Integration | December 10 | December 10 | December 14
+
+---
+
+## Getting Started
+
+Before diving into the lessons, make sure you have everything set up properly:
+
+1. 📋 **Initial Setup**: Follow the instructions in [`docs/GETTINGS_STARTED.md`](docs/GETTINGS_STARTED.md) to configure your environment and install dependencies.
+2. 📚 **Learn Lesson by Lesson**: Once setup is complete, come back here and follow the lessons in order.
+
+Each lesson builds on the previous one, so it's important to follow them sequentially!
+
+---
+
+## Lesson 0: Project Overview and Architecture
+
+**Goal**: Understand the big picture and architecture of the realtime phone agent system.
+
+### Steps:
+
+1. 📖 Read the [Substack article](https://theneuralmaze.substack.com/p/the-architecture-of-realtime-phone) to understand the overall architecture
+2. 🎥 Watch the [Live Session recording](https://theneuralmaze.substack.com/p/the-architecture-of-phone-calling) for a deeper dive
+
+This lesson sets the foundation for everything that follows!
+
+---
+
+## Lesson 1: Building Realtime Voice Agents with FastRTC
+
+**Goal**: Build your first working voice agent using FastRTC and integrate it with Twilio.
+
+### Steps:
+
+1. 📖 **Read the Article**: Start with the [Substack article](https://theneuralmaze.substack.com/p/building-realtime-voice-agents-with) to understand FastRTC fundamentals
+2. 📓 **Work Through the Notebook**: Open and run through [`notebooks/lesson_1_fastrtc_agents.ipynb`](notebooks/lesson_1_fastrtc_agents.ipynb) to get hands-on experience
+3. 💻 **Explore the Code**: Dive into the repository code to see how everything is implemented
+4. 🚀 **Run the Applications**: Try both deployment options:
+
+#### Option A: Gradio Application (Quick Demo)
+
+Run the Gradio interface (check out demo videos in the [Substack article](https://theneuralmaze.substack.com/p/building-realtime-voice-agents-with)):
+
+```bash
+make start-gradio-application
+```
+
+This starts an interactive web interface where you can test the voice agent locally.
+
+#### Option B: FastAPI Call Center (Production-Ready)
+
+For a production-ready setup that can receive real phone calls:
+
+**Step 1**: Start the call center application
+
+```bash
+make start-call-center
+```
+
+This starts a FastAPI application using Docker Compose on port 8000.
+
+**Step 2**: Expose your local server to the internet
+
+```bash
+make start-ngrok-tunnel
+```
+
+Or manually:
+
+```bash
+ngrok http 8000
+```
+
+**Step 3**: Connect to Twilio
+
+Follow the instructions in the [article](https://theneuralmaze.substack.com/p/building-realtime-voice-agents-with) to:
+- Configure your Twilio account
+- Connect your ngrok URL to Twilio
+- Start receiving real phone calls!
+
+🎥 **Join the Live Session**: [Join Premium](https://theneuralmaze.substack.com/subscribe), and you'll receive a notification when we are live on **Sunday, November 23rd at 5PM CET** for a complete walkthrough and Q&A!
 
 ---
 
