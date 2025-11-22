@@ -162,6 +162,8 @@ make start-gradio-application
 
 This starts an interactive web interface where you can test the voice agent locally.
 
+> **_NOTE:_**  If you get the error 'No such file or directory: 'ffprobe', just install _ffmpeg_ in your system to solve it
+
 #### Option B: FastAPI Call Center (Production-Ready)
 
 For a production-ready setup that can receive real phone calls:
