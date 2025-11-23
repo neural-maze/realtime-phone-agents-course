@@ -118,14 +118,8 @@ class FastRTCAgent:
         Returns:
             Configured Stream instance
         """
-
-        async def handler_wrapper(audio: AudioChunk) -> AsyncIterator[AudioChunk]:
-            """Handler that uses instance variables directly."""
-            async for chunk in self._process_audio(audio):
-                yield chunk
-
         return Stream(
-            handler=ReplyOnPause(handler_wrapper),
+            handler=ReplyOnPause(self._process_audio),
             modality="audio",
             mode="send-receive",
         )
@@ -191,7 +185,7 @@ class FastRTCAgent:
         final_text: str | None = None
 
         # Stream LangChain agent updates
-        for chunk in self._react_agent.stream(
+        async for chunk in self._react_agent.astream(
             {"messages": [{"role": "user", "content": transcription}]},
             {"configurable": {"thread_id": self._thread_id}},
             stream_mode="updates",
@@ -209,9 +203,6 @@ class FastRTCAgent:
                     if self._sound_effect_seconds > 0:
                         async for effect_chunk in self._play_sound_effect():
                             yield effect_chunk
-
-                    # Allow event loop to run
-                    await asyncio.sleep(0)
 
                 # Capture final text from model response
                 if step == "model":
