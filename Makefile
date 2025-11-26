@@ -31,7 +31,7 @@ start-gradio-application:
 # --- Application Local Deployment ---
 
 start-call-center:
-	docker compose up -d
+	docker compose up --build -d
 
 stop-call-center:
 	docker compose down

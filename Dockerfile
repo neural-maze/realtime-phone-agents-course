@@ -17,4 +17,4 @@ RUN uv sync --frozen --no-cache
 # App code
 COPY src/realtime_phone_agents realtime_phone_agents/
 
-CMD ["/app/.venv/bin/uvicorn", "realtime_phone_agents.api:app", "--host", "0.0.0.0", "--port", "8000", "--loop", "asyncio"]
+CMD ["/app/.venv/bin/uvicorn", "realtime_phone_agents.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--loop", "asyncio"]

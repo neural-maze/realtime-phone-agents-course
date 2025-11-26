@@ -1,0 +1,12 @@
+NEIGHBORHOODS = ['Chueca-Justicia', 'Imperial', 'Malasaña-Universidad', 'Hortaleza',
+       'Centro', 'Chamartín', 'Ciudad Lineal', 'Barrio de Salamanca',
+       'Chamberí', 'Fuencarral', 'San Blas', 'Goya', 'Palacio', 'Lista',
+       'Ventas', 'Moncloa', 'Huertas-Cortes', 'Vallehermoso',
+       'Prosperidad', 'Pinar del Rey', 'Argüelles', 'Tetuán',
+       'Nueva España', 'Ciudad Universitaria', 'Ciudad Jardín',
+       'Valdeacederas', 'Recoletos', 'El Cañaveral', 'Palos de Moguer',
+       'Bernabéu-Hispanoamérica', 'Retiro', 'Castellana', 'Amposta',
+       'Nuevos Ministerios-Ríos Rosas', 'Lavapiés-Embajadores',
+       'Costillares', 'Trafalgar', 'Buena Vista', 'El Viso', 'Latina',
+       'Moratalaz', 'El Plantío', 'Cuatro Caminos', 'Butarque', 'Sol',
+       'Canillas', 'Fuente del Berro']

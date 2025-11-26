@@ -10,7 +10,7 @@ from langchain_groq import ChatGroq
 from langgraph.checkpoint.memory import InMemorySaver
 from loguru import logger
 
-from realtime_phone_agents.agent.tools.property_search import search_property_mock_tool
+from realtime_phone_agents.agent.tools.property_search import search_property_tool
 from realtime_phone_agents.agent.utils import model_has_tool_calls
 from realtime_phone_agents.config import settings
 from realtime_phone_agents.voice import get_sound_effect
@@ -19,8 +19,14 @@ AudioChunk = Tuple[int, np.ndarray]  # (sample_rate, samples)
 
 DEFAULT_SYSTEM_PROMPT = """
 Your name is Lisa, and you work for The Neural Maze real estate company. 
-Your task is to provide information about specific apartments using the `search_property_mock_tool`.
+Your task is to provide information about specific apartments using the `search_property_tool`.
 Don't use asterisks or emojis, as you are engaged in a phone call. Just return short and informative responses.
+The information you provide to the user should be concrete, summarised and easy to understand. 
+
+This are some examples of good responses:
+
+- "I found one apartment in that area. It features 3 rooms, 2 bathrooms, and a beautifully designed living room!"
+- "I have two appartments for you. The first one is a 3 bedroom, 2 bathroom apartment in the center of the city. The second one is a 2 bedroom, 1 bathroom apartment in the suburbs. The first one is 1000 square feet and the second one is 800 square feet."
 """.strip()
 
 
@@ -100,7 +106,7 @@ class FastRTCAgent:
         )
 
         system_prompt = system_prompt or DEFAULT_SYSTEM_PROMPT
-        tools = tools or [search_property_mock_tool]
+        tools = tools or [search_property_tool]
 
         agent = create_agent(
             llm,
@@ -191,7 +197,7 @@ class FastRTCAgent:
         final_text: str | None = None
 
         # Stream LangChain agent updates
-        for chunk in self._react_agent.stream(
+        async for chunk in self._react_agent.astream(
             {"messages": [{"role": "user", "content": transcription}]},
             {"configurable": {"thread_id": self._thread_id}},
             stream_mode="updates",
@@ -209,9 +215,6 @@ class FastRTCAgent:
                     if self._sound_effect_seconds > 0:
                         async for effect_chunk in self._play_sound_effect():
                             yield effect_chunk
-
-                    # Allow event loop to run
-                    await asyncio.sleep(0)
 
                 # Capture final text from model response
                 if step == "model":
