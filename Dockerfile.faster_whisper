@@ -1,0 +1,14 @@
+FROM ghcr.io/speaches-ai/speaches:latest-cuda
+
+# Expose the default Speaches port
+EXPOSE 8000
+
+# Set up the HuggingFace cache directory
+ENV HF_HOME=/home/ubuntu/.cache/huggingface
+ENV TRANSFORMERS_CACHE=/home/ubuntu/.cache/huggingface/hub
+
+# Ensure the cache directory exists
+RUN mkdir -p /home/ubuntu/.cache/huggingface/hub
+
+# The base image already has the CMD configured
+# Port 8000 is exposed and ready for RunPod deployment

@@ -11,6 +11,7 @@ class GroqSettings(BaseModel):
         default="https://api.groq.com/openai/v1", description="Groq Base URL"
     )
     model: str = Field(default="openai/gpt-oss-20b", description="Groq Model to use")
+    stt_model: str = Field(default="whisper-large-v3-turbo", description="Groq STT Model to use")
 
 
 # --- Groq Configuration ---
@@ -35,12 +36,24 @@ class QdrantSettings(BaseModel):
     use_https: bool = Field(default=False, description="Use HTTPS for Qdrant")
 
 
+# --- RunPod Configuration ---
+class RunPodSettings(BaseModel):
+    api_key: str = Field(default="", description="RunPod API Key")
+    faster_whisper_pod_url: str = Field(default="", description="Faster Whisper Pod URL")
+    faster_whisper_model: str = Field(default="Systran/faster-whisper-large-v3")
+    faster_whisper_gpu_type: str = Field(default="NVIDIA GeForce RTX 4090", description="Faster Whisper GPU Type")
+    
+
+
 # --- Settings Configuration ---
 class Settings(BaseSettings):
     groq: GroqSettings = Field(default_factory=GroqSettings)
     openai: OpenAISettings = Field(default_factory=OpenAISettings)
     superlinked: SuperlinkedSettings = Field(default_factory=SuperlinkedSettings)
     qdrant: QdrantSettings = Field(default_factory=QdrantSettings)
+    runpod: RunPodSettings = Field(default_factory=RunPodSettings)
+
+    stt_model: str = Field(default="faster-whisper", description="Family of STT models to use")
     
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_file=[".env"],

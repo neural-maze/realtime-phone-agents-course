@@ -1,7 +1,7 @@
 from typing import AsyncIterator, List, Optional, Tuple
 
 import numpy as np
-from fastrtc import ReplyOnPause, Stream, get_stt_model, get_tts_model
+from fastrtc import ReplyOnPause, Stream, get_tts_model
 from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 from langgraph.checkpoint.memory import InMemorySaver
@@ -10,7 +10,8 @@ from loguru import logger
 from realtime_phone_agents.agent.tools.property_search import search_property_tool
 from realtime_phone_agents.agent.utils import model_has_tool_calls
 from realtime_phone_agents.config import settings
-from realtime_phone_agents.voice import get_sound_effect
+from realtime_phone_agents.background_effects import get_sound_effect
+from realtime_phone_agents.stt.utils import get_stt_model
 
 AudioChunk = Tuple[int, np.ndarray]  # (sample_rate, samples)
 
@@ -66,7 +67,7 @@ class FastRTCAgent:
             tools: List of tools for the agent (defaults to property search tool)
         """
         # Dependency injection with sensible defaults
-        self._stt_model = stt_model or get_stt_model()
+        self._stt_model = stt_model or get_stt_model(settings.stt_model)
         self._tts_model = tts_model or get_tts_model()
         self._voice_effect = voice_effect or get_sound_effect()
 

@@ -1,4 +1,4 @@
-from realtime_phone_agents.voice.effects.keyboard import KeyboardEffect
+from realtime_phone_agents.background_effects.keyboard import KeyboardEffect
 
 
 def get_sound_effect(effect_type: type | None = None):

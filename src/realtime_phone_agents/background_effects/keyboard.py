@@ -2,7 +2,7 @@ import asyncio
 from pathlib import Path
 from typing import AsyncIterator, List
 
-from realtime_phone_agents.voice.effects.utils.audio_loader import load_audio_chunks
+from realtime_phone_agents.background_effects.utils.audio_loader import load_audio_chunks
 
 from .base import AudioChunk, BaseVoiceEffect
 
