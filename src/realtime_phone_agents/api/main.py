@@ -3,9 +3,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from realtime_phone_agents.infrastructure.superlinked.service import get_property_search_service
 from realtime_phone_agents.api.routes import health, superlinked
 from realtime_phone_agents.api.routes.voice import mount_voice_stream
+from realtime_phone_agents.infrastructure.superlinked.service import (
+    get_property_search_service,
+)
 
 
 @asynccontextmanager

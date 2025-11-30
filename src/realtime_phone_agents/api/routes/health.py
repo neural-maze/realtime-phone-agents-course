@@ -16,4 +16,3 @@ async def health_check():
             "status": "unhealthy",
             "message": f"Service initialization failed: {str(e)}",
         }
-

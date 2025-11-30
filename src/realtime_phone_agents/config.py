@@ -21,11 +21,23 @@ class OpenAISettings(BaseModel):
 
 # --- Superlinked Configuration ---
 class SuperlinkedSettings(BaseModel):
-    embedding_model: str = Field(default="sentence-transformers/all-MiniLM-L6-v2", description="Embedding Model to use for Superlinked")
-    sqft_min_value: int = Field(default=20, description="Minimum value for appartment size in square feet")
-    sqft_max_value: int = Field(default=2000, description="Maximum value for appartment size in square feet")
-    price_min_value: int = Field(default=100000, description="Minimum value for appartment price in euros")
-    price_max_value: int = Field(default=10000000, description="Maximum value for appartment price in euros")
+    embedding_model: str = Field(
+        default="sentence-transformers/all-MiniLM-L6-v2",
+        description="Embedding Model to use for Superlinked",
+    )
+    sqft_min_value: int = Field(
+        default=20, description="Minimum value for appartment size in square feet"
+    )
+    sqft_max_value: int = Field(
+        default=2000, description="Maximum value for appartment size in square feet"
+    )
+    price_min_value: int = Field(
+        default=100000, description="Minimum value for appartment price in euros"
+    )
+    price_max_value: int = Field(
+        default=10000000, description="Maximum value for appartment price in euros"
+    )
+
 
 # --- Qdrant Configuration ---
 class QdrantSettings(BaseModel):
@@ -41,7 +53,7 @@ class Settings(BaseSettings):
     openai: OpenAISettings = Field(default_factory=OpenAISettings)
     superlinked: SuperlinkedSettings = Field(default_factory=SuperlinkedSettings)
     qdrant: QdrantSettings = Field(default_factory=QdrantSettings)
-    
+
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_file=[".env"],
         env_file_encoding="utf-8",

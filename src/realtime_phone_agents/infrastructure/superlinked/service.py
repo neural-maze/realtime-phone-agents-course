@@ -1,11 +1,15 @@
-from loguru import logger
 from typing import Any
+
 import pandas as pd
+from loguru import logger
 from superlinked import framework as sl
 
-from realtime_phone_agents.infrastructure.superlinked.index import property_index, property_schema
-from realtime_phone_agents.infrastructure.superlinked.query import property_search_query
 from realtime_phone_agents.config import settings
+from realtime_phone_agents.infrastructure.superlinked.index import (
+    property_index,
+    property_schema,
+)
+from realtime_phone_agents.infrastructure.superlinked.query import property_search_query
 
 
 class PropertySearchService:
@@ -34,7 +38,9 @@ class PropertySearchService:
         try:
             self._setup_with_qdrant()
         except Exception as e:
-            logger.warning(f"Qdrant setup failed, falling back to InMemoryExecutor: {e}")
+            logger.warning(
+                f"Qdrant setup failed, falling back to InMemoryExecutor: {e}"
+            )
             self._setup_with_memmory()
 
     def _setup_with_qdrant(self):
@@ -50,7 +56,9 @@ class PropertySearchService:
 
         logger.info(f"Connecting to Qdrant at {qdrant_url} ...")
 
-        self.source = sl.RestSource(property_schema, parser=sl.DataFrameParser(schema=property_schema))
+        self.source = sl.RestSource(
+            property_schema, parser=sl.DataFrameParser(schema=property_schema)
+        )
 
         search_descriptor = sl.RestDescriptor(query_path="/search")
         rest_query = sl.RestQuery(search_descriptor, property_search_query)
@@ -66,11 +74,12 @@ class PropertySearchService:
 
         logger.info("PropertySearchService initialized with Qdrant RestExecutor")
 
-
     def _setup_with_memmory(self):
         """Setup the Superlinked application with InMemoryExecutor"""
 
-        self.source = sl.InMemorySource(property_schema, parser=sl.DataFrameParser(schema=property_schema))
+        self.source = sl.InMemorySource(
+            property_schema, parser=sl.DataFrameParser(schema=property_schema)
+        )
 
         executor = sl.InMemoryExecutor(
             sources=[self.source],
@@ -85,31 +94,27 @@ class PropertySearchService:
 
         logger.info(f"Ingesting properties from {properties_data_path} ...")
         df = pd.read_csv(properties_data_path)
-        
+
         self.source.put([df])
         logger.info(f"Ingested {len(df)} properties")
-
 
     def _result_to_properties(self, result) -> list[dict[str, Any]]:
         """Convert QueryResult to clean property dicts by extracting entries and merging id into fields."""
         entries = result.model_dump()["entries"]
         return [{**entry["fields"], "id": int(entry["id"])} for entry in entries]
-        
 
     async def search_properties(self, query: str, limit: int = 1):
         """Search for properties using semantic search and natural queries"""
         try:
             results = await self.app.async_query(
-                property_search_query,
-                natural_query=query,
-                limit=limit
+                property_search_query, natural_query=query, limit=limit
             )
             properties = self._result_to_properties(results)
 
             if not properties:
                 logger.warning(f"Properties for query '{query}' not found")
                 return []
-            
+
             return properties
         except Exception as e:
             logger.error(f"Error searching properties: {e}")
