@@ -204,8 +204,6 @@ Follow the instructions in the [article](https://theneuralmaze.substack.com/p/bu
 - Connect your ngrok URL to Twilio
 - Start receiving real phone calls!
 
-🎥 **Join the Live Session**: [Join Premium](https://theneuralmaze.substack.com/subscribe), and you'll receive a notification when we are live on **Sunday, November 23rd at 5PM CET** for a complete walkthrough and Q&A!
-
 ---
 
 ## Lesson 2: The Missing Layer in Modern AI Retrieval
@@ -257,8 +255,6 @@ Follow the instructions in the [article](https://theneuralmaze.substack.com/p/bu
    Wait for the response. The agent should find and return information about the only apartment in the dataset ([`data/properties.csv`](data/properties.csv)) that meets these criteria!
 
    This demonstrates how the voice agent can now handle complex queries combining location (Barrio de Salamanca) and price constraints (≤ €900,000) in real-time.
-
-🎥 **Join the Live Session**: [Join Premium](https://theneuralmaze.substack.com/subscribe) for the live walkthrough on **Saturday, November 30th** where we'll dive deep into the code and answer your questions!
 
 ---
 
