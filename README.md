@@ -250,6 +250,75 @@ Follow the instructions in the [article](https://theneuralmaze.substack.com/p/bu
 
 ---
 
+# Lesson 3: Improving STT and TTS Systems
+
+**Goal**: Improve the quality of STT and TTS systems used in the voice agent.
+
+### Steps:
+
+1. 📖 **Read the Article**: Start with the [Substack article](https://theneuralmaze.substack.com/p/how-to-deploy-stt-and-tts-systems) to understand the fundamentals of STT and TTS systems, and how to deploy them on Runpod.
+
+2. 📓 **Work Through the Notebook**: Open and run through [`notebooks/lesson_3_stt_tts.ipynb`](notebooks/lesson_3_stt_tts.ipynb) to experience how the new `faster-whisper` and `Orpheus 3B` deployments look like.
+
+3. 💻 **Explore the Code**: It's time to see the additions for `week 3`. Check out the new `stt/` and `tts/` modules in `src/realtime_phone_agents/`:
+
+   - **STT (Speech-to-Text)**:
+     - `local/`: Implementation using **Moonshine** for local inference.
+     - `groq/`: Integration with **Groq's** fast inference API.
+     - `runpod/`: Self-hosted **Faster Whisper** implementation.
+
+   - **TTS (Text-to-Speech)**:
+     - `local/`: Implementation using **Kokoro** for high-quality local synthesis.
+     - `togetherai/`: Integration with **Together AI**.
+     - `runpod/`: Self-hosted **Orpheus 3B** implementation.
+
+4. 🐳 **New Docker Images**: We've added two new Dockerfiles to deploy our custom models on RunPod:
+
+   - **`Dockerfile.faster_whisper`**: Builds a container for the **Faster Whisper** model (large-v3). It uses the `speaches-ai/speaches` base image and pre-downloads the model for faster startup.
+   - **`Dockerfile.orpheus`**: Builds a container for the **Orpheus 3B** model using `llama.cpp` server with CUDA support, optimized for real-time speech generation.
+
+5. 🚀 **Deploy & Interact**: Ready to test these models? Follow these steps:
+
+   > ⚠️ **IMPORTANT**: Before proceeding, ensure you have completed the setup in [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md). This includes setting up your API keys and environment variables (especially for RunPod).
+
+   **Step 1: Deploy to RunPod**
+   
+   Use the Makefile commands to spin up your GPU pods:
+   
+   ```bash
+   # Deploy Faster Whisper
+   make create-faster-whisper-pod
+   
+   # Deploy Orpheus 3B
+   make create-orpheus-pod
+   ```
+   
+   *Note: These scripts will automatically print the endpoint URLs once the pods are ready. Make sure to update your `.env` file with these URLs!*
+
+   **Step 2: Start the Gradio App**
+   
+   Launch the interactive interface to test different combinations:
+   
+   ```bash
+   make start-gradio-application
+   ```
+
+   **Step 3: Experiment!**
+   
+   In the Gradio interface, you can mix and match different implementations:
+   
+   - **STT Options**:
+     - `Moonshine` (Local)
+     - `Whisper` (Groq API)
+     - `Faster Whisper` (RunPod - *requires Step 1*)
+     
+   - **TTS Options**:
+     - `Kokoro` (Local)
+     - `Orpheus` (Together AI API)
+     - `Orpheus` (RunPod - *requires Step 1*)
+
+---
+
 ## The tech stack
 
 <table>
