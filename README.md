@@ -131,6 +131,10 @@ Each lesson builds on the previous one, so it's important to follow them sequent
 
 ## Lesson 0: Project Overview and Architecture
 
+<p align="center">
+    <img src="static/diagrams/system_architecture.png" alt="Lesson 0 Diagram" width="800">
+</p>
+
 **Goal**: Understand the big picture and architecture of the realtime phone agent system.
 
 ### Steps:
@@ -143,6 +147,10 @@ This lesson sets the foundation for everything that follows!
 ---
 
 ## Lesson 1: Building Realtime Voice Agents with FastRTC
+
+<p align="center">
+    <img src="static/diagrams/diagram_lesson_1.png" alt="Lesson 1 Diagram" width="800">
+</p>
 
 **Goal**: Build your first working voice agent using FastRTC and integrate it with Twilio.
 
@@ -202,6 +210,10 @@ Follow the instructions in the [article](https://theneuralmaze.substack.com/p/bu
 
 ## Lesson 2: The Missing Layer in Modern AI Retrieval
 
+<p align="center">
+    <img src="static/diagrams/diagram_lesson_2.png" alt="Lesson 2 Diagram" width="800">
+</p>
+
 **Goal**: Learn how to implement advanced search capabilities for realtime voice agents using Superlinked to handle complex, multi-attribute queries.
 
 ### Steps:
@@ -251,6 +263,10 @@ Follow the instructions in the [article](https://theneuralmaze.substack.com/p/bu
 ---
 
 # Lesson 3: Improving STT and TTS Systems
+
+<p align="center">
+    <img src="static/diagrams/diagram_lesson_3.png" alt="Lesson 3 Diagram" width="800">
+</p>
 
 **Goal**: Improve the quality of STT and TTS systems used in the voice agent.
 
