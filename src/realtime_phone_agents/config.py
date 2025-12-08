@@ -99,6 +99,12 @@ class TogetherTTSSettings(BaseModel):
     sample_rate: int = Field(default=24000, description="Audio sample rate (Hz)")
 
 
+# --- Opik Configuration ---
+class OpikSettings(BaseModel):
+    api_key: str = Field(default="", description="Opik API Key")
+    project_name: str = Field(default="", description="Opik Project Name")
+
+
 # --- Settings Configuration ---
 class Settings(BaseSettings):
     groq: GroqSettings = Field(default_factory=GroqSettings)
@@ -109,6 +115,7 @@ class Settings(BaseSettings):
     faster_whisper: FasterWhisperSettings = Field(default_factory=FasterWhisperSettings)
     orpheus: OrpheusTTSSettings = Field(default_factory=OrpheusTTSSettings)
     together: TogetherTTSSettings = Field(default_factory=TogetherTTSSettings)
+    opik: OpikSettings = Field(default_factory=OpikSettings)
 
     stt_model: str = Field(
         default="whisper-groq",

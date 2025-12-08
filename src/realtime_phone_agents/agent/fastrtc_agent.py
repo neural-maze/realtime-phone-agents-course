@@ -6,11 +6,15 @@ from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 from langgraph.checkpoint.memory import InMemorySaver
 from loguru import logger
+from opik.integrations.langchain import OpikTracer
+from opik import opik_context
+import opik
 
 from realtime_phone_agents.agent.tools.property_search import search_property_tool
 from realtime_phone_agents.agent.utils import model_has_tool_calls
 from realtime_phone_agents.background_effects import get_sound_effect
 from realtime_phone_agents.config import settings
+from realtime_phone_agents.observability.opik import configure as configure_opik
 from realtime_phone_agents.stt import get_stt_model
 from realtime_phone_agents.tts import get_tts_model
 
@@ -74,6 +78,15 @@ class FastRTCAgent:
             system_prompt: Custom system prompt for the agent
             tools: List of tools for the agent (defaults to property search tool)
         """
+        # Configure Opik for tracing
+        configure_opik()
+        
+        # Create Opik tracer for LangChain callbacks
+        self._opik_tracer = OpikTracer(
+            tags=["fastrtc-agent", "realtime-phone"],
+            thread_id=thread_id,
+        )
+        
         # Dependency injection with sensible defaults
         self._stt_model = stt_model or get_stt_model(settings.stt_model)
         self._tts_model = tts_model or get_tts_model(settings.tts_model)
@@ -145,6 +158,7 @@ class FastRTCAgent:
             mode="send-receive",
         )
 
+    @opik.track(name="generate-avatar-response", capture_input=False, capture_output=False)
     async def _process_audio(
         self,
         audio: AudioChunk,
@@ -160,6 +174,7 @@ class FastRTCAgent:
         Yields:
             Audio chunks to be played back to the user
         """
+
         # Step 1: Transcribe audio to text
         transcription = await self._transcribe(audio)
         logger.info(f"Transcription: {transcription}")
@@ -177,6 +192,7 @@ class FastRTCAgent:
             async for audio_chunk in self._synthesize_speech(final_response):
                 yield audio_chunk
 
+    @opik.track(name="stt-transcription", capture_input=False, capture_output=True)
     async def _transcribe(self, audio: AudioChunk) -> str:
         """
         Transcribe audio to text using STT model.
@@ -189,6 +205,7 @@ class FastRTCAgent:
         """
         return self._stt_model.stt(audio)
 
+    @opik.track(name="generate-agent-response")
     async def _process_with_agent(
         self,
         transcription: str,
@@ -204,11 +221,14 @@ class FastRTCAgent:
             Audio chunks for tool use messages and effects
         """
         final_text: str | None = None
-
-        # Stream LangChain agent updates
+        
+        # Stream LangChain agent updates with Opik tracing
         async for chunk in self._react_agent.astream(
             {"messages": [{"role": "user", "content": transcription}]},
-            {"configurable": {"thread_id": self._thread_id}},
+            {
+                "configurable": {"thread_id": self._thread_id},
+                "callbacks": [self._opik_tracer]
+            },
             stream_mode="updates",
         ):
             for step, data in chunk.items():
@@ -231,6 +251,13 @@ class FastRTCAgent:
 
         # Store final text for later retrieval
         self._last_final_text = final_text
+
+        if final_text:
+            opik_context.update_current_trace(
+                thread_id=self._thread_id,
+                input={"transcription": transcription},
+                output={"final_text": final_text},
+            )
 
     def _extract_final_text(self, model_step_data) -> Optional[str]:
         """
@@ -256,6 +283,7 @@ class FastRTCAgent:
         """
         return getattr(self, "_last_final_text", None) or self._fallback_message
 
+    @opik.track(name="tts-generation", capture_input=True, capture_output=False)
     async def _synthesize_speech(self, text: str) -> AsyncIterator[AudioChunk]:
         """
         Convert text to speech audio chunks.
@@ -269,6 +297,7 @@ class FastRTCAgent:
         async for audio_chunk in self._tts_model.stream_tts(text):
             yield audio_chunk
 
+    @opik.track(name="play-sound-effect", capture_input=False, capture_output=False)
     async def _play_sound_effect(self) -> AsyncIterator[AudioChunk]:
         """
         Play the configured sound effect.
@@ -308,6 +337,11 @@ class FastRTCAgent:
     def voice_effect(self):
         """Get the voice effect."""
         return self._voice_effect
+
+    @property
+    def opik_tracer(self):
+        """Get the Opik tracer."""
+        return self._opik_tracer
 
     def set_thread_id(self, thread_id: str) -> None:
         """

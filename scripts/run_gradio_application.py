@@ -1,6 +1,7 @@
 import logging
 import os
 import warnings
+from uuid import uuid4
 
 # Suppress all warnings before importing other modules
 warnings.filterwarnings("ignore")
@@ -157,6 +158,7 @@ def main():
             stt_model=stt_model_instance,
             tts_model=tts_model_instance,
             tools=[search_property_tool],
+            thread_id=str("gradio-application-" + str(uuid4())),
         )
         print_success("FastRTC Agent created successfully")
     except Exception as e:
