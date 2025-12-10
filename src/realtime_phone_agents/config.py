@@ -47,7 +47,8 @@ class QdrantSettings(BaseModel):
     host: str = Field(default="qdrant", description="Qdrant Host")
     port: int = Field(default=6333, description="Qdrant Port")
     api_key: str = Field(default="", description="Qdrant API Key")
-    use_https: bool = Field(default=False, description="Use HTTPS for Qdrant")
+    cluster_url: str = Field(default="", description="Qdrant Cluster URL")
+    use_qdrant_cloud: bool = Field(default=True, description="Use Qdrant Cloud")
 
 
 # --- RunPod Configuration ---
@@ -105,6 +106,12 @@ class OpikSettings(BaseModel):
     project_name: str = Field(default="", description="Opik Project Name")
 
 
+# --- Twilio Configuration ---
+class TwilioSettings(BaseModel):
+    account_sid: str = Field(default="", description="Twilio Account SID")
+    auth_token: str = Field(default="", description="Twilio Auth Token")
+
+
 # --- Settings Configuration ---
 class Settings(BaseSettings):
     groq: GroqSettings = Field(default_factory=GroqSettings)
@@ -116,6 +123,7 @@ class Settings(BaseSettings):
     orpheus: OrpheusTTSSettings = Field(default_factory=OrpheusTTSSettings)
     together: TogetherTTSSettings = Field(default_factory=TogetherTTSSettings)
     opik: OpikSettings = Field(default_factory=OpikSettings)
+    twilio: TwilioSettings = Field(default_factory=TwilioSettings)
 
     stt_model: str = Field(
         default="whisper-groq",

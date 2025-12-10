@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from realtime_phone_agents.api.routes import health, superlinked
+from realtime_phone_agents.api.routes import health, superlinked, voice
 from realtime_phone_agents.api.routes.voice import mount_voice_stream
 from realtime_phone_agents.infrastructure.superlinked.service import (
     get_property_search_service,
@@ -38,6 +38,7 @@ app.add_middleware(
 # Include routers
 app.include_router(health.router)
 app.include_router(superlinked.router)
+app.include_router(voice.router)
 
 # Mount voice stream for Twilio integration
 mount_voice_stream(app)

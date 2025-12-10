@@ -2,6 +2,7 @@ from typing import AsyncIterator, List, Optional, Tuple
 
 import numpy as np
 from fastrtc import ReplyOnPause, Stream
+from realtime_phone_agents.agent.stream import VoiceAgentStream
 from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 from langgraph.checkpoint.memory import InMemorySaver
@@ -14,33 +15,11 @@ from realtime_phone_agents.agent.tools.property_search import search_property_to
 from realtime_phone_agents.agent.utils import model_has_tool_calls
 from realtime_phone_agents.background_effects import get_sound_effect
 from realtime_phone_agents.config import settings
-from realtime_phone_agents.observability.opik import configure as configure_opik
 from realtime_phone_agents.stt import get_stt_model
 from realtime_phone_agents.tts import get_tts_model
+from realtime_phone_agents.avatars.registry import get_avatar
 
 AudioChunk = Tuple[int, np.ndarray]  # (sample_rate, samples)
-
-DEFAULT_SYSTEM_PROMPT = """
-Your name is Lisa, and you are a real estate assistant working for The Neural Maze real estate company.
-Your role is to provide short, clear, concrete, and summarised information about apartments.
-You must use the search_property_tool whenever you need property details.
-
-# Communication workflow:
-Always start introducing yourself and asking the user for their name and then ask them what they are looking for.
-
-# Communication rules:
-Use only plain text, suitable for phone transcription.
-Do not use emojis, asterisks, bullet points, or any special formatting.
-Write all numbers fully in words. For example, three instead of 3.
-Keep answers concise, friendly, and easy to follow. Don't exceed 1 line of text.
-Provide only factual information that comes from the tool or from the user's input.
-
-# Property Search Rules:
-
-If the tool provides more than 1 property, just mention the first one and ask the user if they want to see more.
-Don't mention all the information about the properties, just the price, location and number of rooms and bathrooms in a friendly manner. Say things
-like: "I think I found your future appartment" or "I think I found the perfect appartment for you"
-""".strip()
 
 
 class FastRTCAgent:
@@ -61,7 +40,7 @@ class FastRTCAgent:
         voice_effect=None,
         thread_id: str = "default",
         fallback_message: str = "I'm sorry, I couldn't find anything useful in the system.",
-        system_prompt: str | None = None,
+        avatar: str | None = "tara",
         tools: List | None = None,
     ):
         """
@@ -75,12 +54,9 @@ class FastRTCAgent:
             voice_effect: Voice effect instance (defaults to get_sound_effect())
             thread_id: Thread ID for agent conversation tracking
             fallback_message: Message to return when no answer is found
-            system_prompt: Custom system prompt for the agent
+            avatar: Avatar for the agent
             tools: List of tools for the agent (defaults to property search tool)
         """
-        # Configure Opik for tracing
-        configure_opik()
-        
         # Create Opik tracer for LangChain callbacks
         self._opik_tracer = OpikTracer(
             tags=["fastrtc-agent", "realtime-phone"],
@@ -92,9 +68,11 @@ class FastRTCAgent:
         self._tts_model = tts_model or get_tts_model(settings.tts_model)
         self._voice_effect = voice_effect or get_sound_effect()
 
+        self._avatar = get_avatar(avatar)
+
         # Create the React agent directly inside the class
         self._react_agent = self._create_react_agent(
-            system_prompt=system_prompt,
+            system_prompt=self._avatar.get_system_prompt(),
             tools=tools,
         )
 
@@ -127,7 +105,6 @@ class FastRTCAgent:
             api_key=settings.groq.api_key,
         )
 
-        system_prompt = system_prompt or DEFAULT_SYSTEM_PROMPT
         tools = tools or [search_property_tool]
 
         agent = create_agent(
@@ -152,7 +129,7 @@ class FastRTCAgent:
             async for chunk in self._process_audio(audio):
                 yield chunk
 
-        return Stream(
+        return VoiceAgentStream(
             handler=ReplyOnPause(handler_wrapper),
             modality="audio",
             mode="send-receive",

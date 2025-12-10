@@ -11,6 +11,12 @@ services:
       - sentence_transformers_cache:/root/.cache/huggingface
     env_file:
       - .env
+    environment:
+      - QDRANT__USE_QDRANT_CLOUD=false
+      - QDRANT__HOST=qdrant
+      - QDRANT__PORT=6333
+      - QDRANT__API_KEY=
+      - QDRANT__CLUSTER_URL=
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s

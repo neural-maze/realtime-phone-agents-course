@@ -31,11 +31,24 @@ create-faster-whisper-pod:
 create-orpheus-pod:
 	uv run python scripts/runpod/create_orpheus_pod.py
 
+create-call-center-pod:
+	uv run python scripts/runpod/create_call_center_pod.py
+
 
 # --- Run Gradio ---
 
 start-gradio-application:
 	uv run python scripts/run_gradio_application.py
+
+# --- Qdrant Cloud Ingestion ---
+
+ingest-properties:
+	uv run python scripts/ingest_properties.py
+
+# --- Outbound Calls ---
+
+outbound-call:
+	uv run python scripts/make_outbound_call.py
 
 # --- Application Local Deployment ---
 

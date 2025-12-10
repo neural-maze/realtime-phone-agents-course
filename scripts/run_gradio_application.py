@@ -81,8 +81,20 @@ def main():
     
     tts_choices = [
         ("Kokoro - Local high-quality TTS via FastRTC (default)", "kokoro"),
-        ("Orpheus RunPod - Orpheus TTS via RunPod deployment", "orpheus-runpod"),
         ("Together AI - Together AI API", "together"),
+        ("Orpheus RunPod - Orpheus TTS via RunPod deployment", "orpheus-runpod"),
+        
+    ]
+    
+    avatar_choices = [
+        ("Leo", "leo"),
+        ("Zac", "zac"),
+        ("Dan", "dan"),
+        ("Jess", "jess"),
+        ("Tara (default)", "tara"),
+        ("Zoe", "zoe"),
+        ("Mia", "mia"),
+        ("Leah", "leah"),
     ]
     
     # Create interactive questions
@@ -99,6 +111,12 @@ def main():
             choices=tts_choices,
             default="kokoro",
         ),
+        inquirer.List(
+            "avatar",
+            message="Select Avatar",
+            choices=avatar_choices,
+            default="tara",
+        ),
     ]
     
     try:
@@ -109,6 +127,7 @@ def main():
         
         stt_model = answers["stt_model"]
         tts_model = answers["tts_model"]
+        avatar = answers["avatar"]
     except KeyboardInterrupt:
         print("\n\n👋 Selection cancelled by user")
         sys.exit(0)
@@ -117,6 +136,7 @@ def main():
     print("=" * 60)
     print(f"📝 STT Model: {stt_model}")
     print(f"🔊 TTS Model: {tts_model}")
+    print(f"🎭 Avatar: {avatar}")
     print("=" * 60)
     print()
 
@@ -144,6 +164,12 @@ def main():
     print_info(f"Initializing {tts_model} TTS model...")
     try:
         tts_model_instance = get_tts_model(tts_model)
+        
+        # Set voice for Together AI or Orpheus RunPod models
+        if tts_model in ["together", "orpheus-runpod"]:
+            print_info(f"Setting voice to {avatar} for {tts_model} model...")
+            tts_model_instance.set_voice(avatar)
+        
         print_success("TTS model initialized")
     except Exception as e:
         print_error(f"Error initializing TTS model: {e}")
@@ -159,6 +185,7 @@ def main():
             tts_model=tts_model_instance,
             tools=[search_property_tool],
             thread_id=str("gradio-application-" + str(uuid4())),
+            avatar=avatar,
         )
         print_success("FastRTC Agent created successfully")
     except Exception as e:

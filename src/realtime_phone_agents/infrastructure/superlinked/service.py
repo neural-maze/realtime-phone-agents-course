@@ -20,12 +20,14 @@ class PropertySearchService:
         qdrant_host: str | None,
         qdrant_port: int | None,
         qdrant_api_key: str | None,
-        qdrant_use_https: bool | None,
+        qdrant_cluster_url: str | None,
+        qdrant_use_cloud: bool | None,
     ):
         self.qdrant_host = qdrant_host
         self.qdrant_port = qdrant_port
         self.qdrant_api_key = qdrant_api_key
-        self.qdrant_use_https = qdrant_use_https
+        self.qdrant_cluster_url = qdrant_cluster_url
+        self.qdrant_use_cloud = qdrant_use_cloud
 
         self.app = None
         self.source = None
@@ -45,8 +47,12 @@ class PropertySearchService:
 
     def _setup_with_qdrant(self):
         """Setup the Superlinked application with RestExecutor and Qdrant"""
-        protocol = "https" if self.qdrant_use_https else "http"
-        qdrant_url = f"{protocol}://{self.qdrant_host}:{self.qdrant_port}"
+        protocol = "https" if self.qdrant_use_cloud else "http"
+
+        if self.qdrant_use_cloud:
+            qdrant_url = f"{self.qdrant_cluster_url}:{self.qdrant_port}"
+        else:
+            qdrant_url = f"{protocol}://{self.qdrant_host}:{self.qdrant_port}"
 
         vector_db = sl.QdrantVectorDatabase(
             url=qdrant_url,
@@ -129,7 +135,8 @@ def get_property_search_service(
     qdrant_host: str | None = settings.qdrant.host,
     qdrant_port: int | None = settings.qdrant.port,
     qdrant_api_key: str | None = settings.qdrant.api_key,
-    qdrant_use_https: bool | None = settings.qdrant.use_https,
+    qdrant_cluster_url: str | None = settings.qdrant.cluster_url,
+    qdrant_use_cloud: bool | None = settings.qdrant.use_qdrant_cloud,
 ) -> PropertySearchService:
     """Get or create the global property search service instance."""
     global _property_service
@@ -138,6 +145,7 @@ def get_property_search_service(
             qdrant_host=qdrant_host,
             qdrant_port=qdrant_port,
             qdrant_api_key=qdrant_api_key,
-            qdrant_use_https=qdrant_use_https,
+            qdrant_cluster_url=qdrant_cluster_url,
+            qdrant_use_cloud=qdrant_use_cloud,
         )
     return _property_service
