@@ -21,6 +21,7 @@
 - [Lesson 1: Building Realtime Voice Agents with FastRTC](#lesson-1-building-realtime-voice-agents-with-fastrtc)
 - [Lesson 2: The Missing Layer in Modern AI Retrieval](#lesson-2-the-missing-layer-in-modern-ai-retrieval)  
 - [Lesson 3: Improving STT and TTS Systems](#lesson-3-improving-stt-and-tts-systems)
+- [Lesson 4: Deploying a multi-avatar Voice Agent with Full Tracing](#lesson-4-deploying-a-multi-avatar-voice-agent-with-full-tracing)
 - [The tech stack](#the-tech-stack)
 - [Contributors](#contributors)
 - [License](#license)
@@ -115,7 +116,7 @@ Here’s what the upcoming weeks look like 👇
 | <div align="center">1</div> | <a href="https://theneuralmaze.substack.com/p/building-realtime-voice-agents-with">Building Realtime Voice Agents with FastRTC</a> | <a href="https://theneuralmaze.substack.com/p/building-realtime-voice-agents-with"><img src="static/diagrams/diagram_lesson_1.png" alt="Diagram 1" width="300"></a> | <a href="https://github.com/neural-maze/realtime-phone-agents-course/tree/week1">Week 1</a> | <a href="https://theneuralmaze.substack.com/p/building-realtime-voice-agents-with-52e"><img src="static/thumbnails/live_session_1.png" alt="Thumbnail 1" width="400"></a> |
 | <div align="center">2</div> | <a href="https://theneuralmaze.substack.com/p/the-missing-layer-in-modern-ai-retrieval">The Missing Layer in Modern AI Retrieval</a> | <a href="https://theneuralmaze.substack.com/p/the-missing-layer-in-modern-ai-retrieval"><img src="static/diagrams/diagram_lesson_2.png" alt="Diagram 2" width="300"></a> | <a href="https://github.com/neural-maze/realtime-phone-agents-course/tree/week2">Week 2</a> | <a href="https://theneuralmaze.substack.com/p/the-missing-layer-in-modern-ai-retrieval-af7"><img src="static/thumbnails/live_session_2.png" alt="Thumbnail 2" width="400"></a> |
 | <div align="center">3</div> | <a href="https://theneuralmaze.substack.com/p/how-to-deploy-stt-and-tts-systems">Improving STT and TTS Systems</a> | <a href="https://theneuralmaze.substack.com/p/how-to-deploy-stt-and-tts-systems"><img src="static/diagrams/diagram_lesson_3.png" alt="Diagram 3" width="300"></a> | <a href="https://github.com/neural-maze/realtime-phone-agents-course/tree/week3">Week 3</a> | December 7 |
-| <div align="center">4</div> | Deployment, monitoring and Twilio Integration | December 10 | December 10 | December 14
+| <div align="center">4</div> | <a href="https://theneuralmaze.substack.com/p/deploying-a-multi-avatar-voice-agent">Deploying a multi-avatar Voice Agent with Full Tracing</a> | <a href="https://theneuralmaze.substack.com/p/deploying-a-multi-avatar-voice-agent"><img src="static/diagrams/diagram_lesson_4.png" alt="Diagram 4" width="300"></a> | <a href="https://github.com/neural-maze/realtime-phone-agents-course/tree/week4">Week 4</a> | December 14
 
 ---
 
@@ -332,6 +333,112 @@ Follow the instructions in the [article](https://theneuralmaze.substack.com/p/bu
 
 ---
 
+## Lesson 4: Deploying a multi-avatar Voice Agent with Full Tracing
+
+<p align="center">
+    <img src="static/diagrams/diagram_lesson_4.png" alt="Lesson 4 Diagram" width="800">
+</p>
+
+**Goal**: Deploy a production-ready call center with multiple avatars, full tracing, and Twilio integration for inbound and outbound calls.
+
+### Steps:
+
+1. 📖 **Read the Article**: Start with the [Substack article](https://theneuralmaze.substack.com/p/deploying-a-multi-avatar-voice-agent) to understand:
+   - How to build a multi-avatar system with different personas
+   - How to implement full tracing of every interaction using Opik
+   - How to version prompts and store transcribed conversations
+   - How to deploy to Runpod and integrate with Twilio
+
+2. 📓 **Work Through the Notebook**: Open and run through [`notebooks/lesson_4_avatar_system.ipynb`](notebooks/lesson_4_avatar_system.ipynb) to explore:
+   - How to define and work with different avatars
+   - How each avatar has its own personality, style, and voice
+   - How to fetch and use avatars in your application
+
+3. 💻 **Explore the Code**: Check out the new additions for `week 4`:
+
+   - **Avatar System** (`src/realtime_phone_agents/avatars/`):
+     - `base.py`: Base Avatar class with system prompt generation and versioning
+     - `registry.py`: Utility to list, fetch, and manage avatars
+     - `definitions/`: YAML files defining each avatar's personality (dan, jess, leah, leo, mia, tara, zac, zoe)
+
+   - **Observability** (`src/realtime_phone_agents/observability/`):
+     - `opik_utils.py`: Utilities for tracing with Opik
+     - `prompt_versioning.py`: System for versioning all prompts
+
+   - **Updated Agent** (`src/realtime_phone_agents/agent/fastrtc_agent.py`):
+     - Added `@opik.track` decorators to trace every method in the pipeline
+     - Tracks STT transcription, LLM responses, tool calls, and TTS generation
+     - Stores complete conversation threads in Opik
+
+4. 🚀 **Deploy to Production**: Time to deploy your call center to the cloud!
+
+   > ⚠️ **IMPORTANT**: Make sure your `.env` file includes all required variables from [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md), including:
+   > - Opik API key for tracing
+   > - Qdrant Cloud credentials
+   > - Twilio credentials
+   > - Runpod API key
+   > - All STT/TTS model configurations
+
+   **Step 1: Deploy the Call Center to Runpod**
+
+   ```bash
+   make create-call-center-pod
+   ```
+
+   This will deploy your FastAPI application to Runpod and give you a URL like:
+   ```
+   https://your-pod-id.proxy.runpod.net
+   ```
+
+   **Step 2: Ingest Properties to Qdrant Cloud**
+
+   ```bash
+   make ingest-properties
+   ```
+
+   This populates your Qdrant Cloud cluster with property data for the agent to search.
+
+   **Step 3: Configure Twilio**
+
+   - Go to your Twilio TwiML App
+   - Replace your ngrok URL with your Runpod URL:
+     ```
+     https://your-pod-id.proxy.runpod.net/voice/telephone/incoming
+     ```
+   - Save the configuration
+
+   **Step 4: Test Inbound Calls**
+
+   Call your Twilio number and interact with your deployed agent! The system will:
+   - Answer with the avatar you configured (`AVATAR_NAME` in `.env`)
+   - Search properties using Superlinked
+   - Trace every interaction in Opik
+   - Store the full conversation
+
+   **Step 5: Make Outbound Calls**
+
+   You can also make outbound calls programmatically:
+
+   ```bash
+   make outbound-call
+   ```
+
+   This will trigger a call from your agent to the specified number!
+
+5. 📊 **Monitor with Opik**: Open your Opik dashboard to see:
+   - **Traces**: Every step of the conversation pipeline with timing information
+   - **Threads**: Complete transcribed conversations stored for analysis
+   - **Prompts**: Versioned system prompts for each avatar
+
+   You'll be able to track:
+   - How long transcription takes
+   - LLM response times
+   - Tool call performance
+   - TTS generation speed
+   - Complete conversation flow
+
+---
+
 ## The tech stack
 
 <table>
@@ -346,7 +453,7 @@ Follow the instructions in the [article](https://theneuralmaze.substack.com/p/bu
   </tr>
   <tr>
     <td><img src="static/superlinked_logo.png" width="100" alt="Superlinked Logo"/></td>
-    <td>SSuperlinked is a Python framework for AI Engineers building high-performance search & recommendation applications that combine structured and unstructured data.
+    <td>Superlinked is a Python framework for AI Engineers building high-performance search & recommendation applications that combine structured and unstructured data.
 
 </td>
   </tr>
