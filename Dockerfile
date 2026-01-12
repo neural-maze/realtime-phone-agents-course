@@ -10,9 +10,14 @@ RUN apt-get update && \
 
 WORKDIR /app
 
+# Use system Python instead of managing Python installations
+ENV UV_SYSTEM_PYTHON=1
+ENV UV_CACHE_DIR=/root/.cache/uv
+
 # Python deps
 COPY uv.lock pyproject.toml README.md ./
-RUN uv sync --frozen --no-cache
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
 
 # App code
 COPY src/realtime_phone_agents realtime_phone_agents/
