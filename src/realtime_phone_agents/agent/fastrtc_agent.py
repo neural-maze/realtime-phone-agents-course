@@ -11,7 +11,6 @@ from opik.integrations.langchain import OpikTracer
 from opik import opik_context
 import opik
 
-from realtime_phone_agents.agent.tools.property_search import search_property_tool
 from realtime_phone_agents.agent.utils import model_has_tool_calls
 from realtime_phone_agents.background_effects import get_sound_effect
 from realtime_phone_agents.config import settings
@@ -33,13 +32,13 @@ class FastRTCAgent:
 
     def __init__(
         self,
-        tool_use_message: str = "Let me look for that in the system",
-        sound_effect_seconds: float = 3.0,
+        tool_use_message: str = "",
+        sound_effect_seconds: float = 0.0,
         stt_model=None,
         tts_model=None,
         voice_effect=None,
         thread_id: str = "default",
-        fallback_message: str = "I'm sorry, I couldn't find anything useful in the system.",
+        fallback_message: str = "Lo siento, no he podido encontrar información útil en este momento.",
         avatar: str | None = "tara",
         tools: List | None = None,
     ):
@@ -105,7 +104,7 @@ class FastRTCAgent:
             api_key=settings.groq.api_key,
         )
 
-        tools = tools or [search_property_tool]
+        tools = tools or []
 
         agent = create_agent(
             llm,

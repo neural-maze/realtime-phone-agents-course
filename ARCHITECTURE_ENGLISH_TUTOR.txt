@@ -1,0 +1,206 @@
+===============================================================================
+                    ENGLISH TUTOR - ARCHITECTURE DIAGRAM
+===============================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           USER INTERFACE (Gradio)                        │
+│                                                                          │
+│  ┌─────────────────┐                        ┌──────────────────┐       │
+│  │   Text Input    │                        │   Voice Input    │       │
+│  │   (Keyboard)    │                        │  (Microphone)    │       │
+│  └────────┬────────┘                        └────────┬─────────┘       │
+│           │                                          │                  │
+│           └──────────────────┬───────────────────────┘                  │
+│                              │                                          │
+└──────────────────────────────┼──────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         PROCESSING LAYER                                 │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────┐        │
+│  │  STT (Speech-to-Text)                                       │        │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │        │
+│  │  │ Whisper-Groq │  │  Moonshine   │  │Faster Whisper│      │        │
+│  │  │   (Cloud)    │  │   (Local)    │  │   (Local)    │      │        │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘      │        │
+│  └─────────────────────────────┬─────────────────────────────────┘     │
+│                                │                                        │
+│                                ▼                                        │
+│  ┌──────────────────────────────────────────────────────────────┐      │
+│  │                    TEXT PROCESSING                            │      │
+│  │                                                               │      │
+│  │         ┌─────────────────────────────────┐                  │      │
+│  │         │   LANGGRAPH AGENT (Tutor AI)    │                  │      │
+│  │         │                                  │                  │      │
+│  │         │  ┌────────────────────────────┐ │                  │      │
+│  │         │  │   State Management         │ │                  │      │
+│  │         │  │  - Messages History        │ │                  │      │
+│  │         │  │  - Current Exercise        │ │                  │      │
+│  │         │  │  - Student Response        │ │                  │      │
+│  │         │  │  - Feedback                │ │                  │      │
+│  │         │  └────────────────────────────┘ │                  │      │
+│  │         │                                  │                  │      │
+│  │         │  ┌────────────────────────────┐ │                  │      │
+│  │         │  │   Workflow Nodes           │ │                  │      │
+│  │         │  │  - Respond (Conversation)  │ │                  │      │
+│  │         │  │  - Generate Exercise       │ │                  │      │
+│  │         │  │  - Provide Feedback        │ │                  │      │
+│  │         │  └────────────────────────────┘ │                  │      │
+│  │         │                                  │                  │      │
+│  │         │  ┌────────────────────────────┐ │                  │      │
+│  │         │  │   LLM Backend (Ollama)     │ │                  │      │
+│  │         │  │  - llama3.2 / qwen2.5      │ │                  │      │
+│  │         │  │  - Local Inference         │ │                  │      │
+│  │         │  └────────────────────────────┘ │                  │      │
+│  │         └─────────────────────────────────┘                  │      │
+│  │                          │                                    │      │
+│  └──────────────────────────┼────────────────────────────────────┘      │
+│                             │                                           │
+│                             ▼                                           │
+│  ┌─────────────────────────────────────────────────────────────┐       │
+│  │  TTS (Text-to-Speech)                                       │       │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │       │
+│  │  │   Kokoro     │  │  Together AI │  │   Edge TTS   │      │       │
+│  │  │  (Local EN)  │  │   (Cloud)    │  │   (Cloud)    │      │       │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘      │       │
+│  └─────────────────────────────────────────────────────────────┘       │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         BUSINESS LOGIC LAYER                             │
+│                                                                          │
+│  ┌────────────────────────┐  ┌────────────────────────┐                │
+│  │  Competency Tracker    │  │  Exercise Generator    │                │
+│  │                        │  │                        │                │
+│  │  - Track 6 skills      │  │  - Grammar exercises   │                │
+│  │  - Calculate scores    │  │  - Vocabulary drills   │                │
+│  │  - Identify weak areas │  │  - Conversation topics │                │
+│  │  - Give recommendations│  │  - Adaptive difficulty │                │
+│  └────────────────────────┘  └────────────────────────┘                │
+│                                                                          │
+│  ┌─────────────────────────────────────────────────────────────┐       │
+│  │                  Student Profile Model                       │       │
+│  │                                                              │       │
+│  │  - Name                                                      │       │
+│  │  - Level (Beginner/Intermediate/Advanced)                   │       │
+│  │  - Competencies:                                             │       │
+│  │    * Grammar (0-100)                                         │       │
+│  │    * Vocabulary (0-100)                                      │       │
+│  │    * Pronunciation (0-100)                                   │       │
+│  │    * Listening (0-100)                                       │       │
+│  │    * Speaking (0-100)                                        │       │
+│  │    * Writing (0-100)                                         │       │
+│  │  - Exercises Completed                                       │       │
+│  │  - Total Practice Time                                       │       │
+│  └─────────────────────────────────────────────────────────────┘       │
+│                                                                          │
+└──────────────────────────────────┬───────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         PERSISTENCE LAYER                                │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────┐      │
+│  │                    SQLite Database                            │      │
+│  │                   (data/students.db)                          │      │
+│  │                                                               │      │
+│  │  ┌───────────────────────────────────────────────────────┐   │      │
+│  │  │  students TABLE                                        │   │      │
+│  │  │  ┌──────────────────────────────────────────────────┐ │   │      │
+│  │  │  │ name (PK)                                        │ │   │      │
+│  │  │  │ level                                            │ │   │      │
+│  │  │  │ competencies (JSON)                              │ │   │      │
+│  │  │  │ exercises_completed                              │ │   │      │
+│  │  │  │ total_practice_time                              │ │   │      │
+│  │  │  └──────────────────────────────────────────────────┘ │   │      │
+│  │  └───────────────────────────────────────────────────────┘   │      │
+│  │                                                               │      │
+│  │  Operations:                                                  │      │
+│  │  - save_profile(profile)                                     │      │
+│  │  - load_profile(name) -> StudentProfile                      │      │
+│  │  - list_students() -> List[str]                              │      │
+│  └──────────────────────────────────────────────────────────────┘      │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+
+===============================================================================
+                           DATA FLOW EXAMPLE
+===============================================================================
+
+User Speaks: "Can you help me with grammar?"
+    │
+    ▼
+[STT] Whisper-Groq transcribes → "Can you help me with grammar?"
+    │
+    ▼
+[LangGraph Agent]
+    │
+    ├─ State: Add HumanMessage("Can you help me with grammar?")
+    │
+    ├─ Node: "respond" - Check if exercise requested
+    │   └─ Conditional: keyword "grammar" found → route to "exercise"
+    │
+    ├─ Node: "exercise"
+    │   ├─ Query StudentProfile → weakest_competency = GRAMMAR
+    │   ├─ Call ExerciseGenerator.generate_grammar_exercise()
+    │   └─ Generate: "Fill in the blank: I ___ to the store yesterday."
+    │
+    └─ State: Add AIMessage(exercise_text)
+    │
+    ▼
+[TTS] Kokoro synthesizes speech
+    │
+    ▼
+[Gradio UI] Displays text + plays audio
+    │
+    ▼
+User hears and sees: "Let's practice grammar! Fill in the blank: I ___ ..."
+
+
+===============================================================================
+                           KEY TECHNOLOGIES
+===============================================================================
+
+Framework:          LangGraph (Stateful Agent Workflows)
+LLM:                Ollama (Local Large Language Models)
+UI:                 Gradio (Web Interface with Audio Support)
+STT:                Whisper variants (Speech Recognition)
+TTS:                Kokoro/Together/Edge (Speech Synthesis)
+Database:           SQLite (Lightweight Persistence)
+State Management:   LangGraph MemorySaver
+Language:           Python 3.11+
+Dependencies:       langchain, langchain-ollama, gradio, pydantic
+
+
+===============================================================================
+                         INTEGRATION WITH PARENT PROJECT
+===============================================================================
+
+The English Tutor reuses STT/TTS models from the parent project:
+
+Parent Project: realtime-phone-agents-course
+    │
+    ├─ src/realtime_phone_agents/
+    │   ├─ stt/
+    │   │   ├─ groq/          ← Imported by english_tutor
+    │   │   ├─ local/         ← Imported by english_tutor
+    │   │   └─ utils.py       ← get_stt_model()
+    │   │
+    │   └─ tts/
+    │       ├─ kokoro/        ← Imported by english_tutor
+    │       ├─ togetherai/    ← Imported by english_tutor
+    │       └─ utils.py       ← get_tts_model()
+    │
+    └─ english_tutor/         ← New standalone project
+        └─ src/english_tutor/
+            ├─ models/
+            │   ├─ stt.py     → Wraps parent's get_stt_model()
+            │   └─ tts.py     → Wraps parent's get_tts_model()
+            └─ ...
+
+
+===============================================================================

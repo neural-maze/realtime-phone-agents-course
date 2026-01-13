@@ -33,9 +33,10 @@ import sys
 import inquirer
 
 from realtime_phone_agents.agent.fastrtc_agent import FastRTCAgent
-from realtime_phone_agents.agent.tools.property_search import search_property_tool
-from realtime_phone_agents.infrastructure.superlinked.service import (
-    get_property_search_service,
+from realtime_phone_agents.agent.tools.debt_profiling import (
+    save_client_data,
+    get_client_summary,
+    finalize_profile,
 )
 from realtime_phone_agents.stt.utils import get_stt_model
 from realtime_phone_agents.tts.utils import get_tts_model
@@ -44,7 +45,7 @@ from realtime_phone_agents.tts.utils import get_tts_model
 def print_header():
     """Print a nice header for the application."""
     print("\n" + "=" * 60)
-    print("🚀 FastRTC Agent Application")
+    print("SolucionaMiDeuda - Agente de Perfilado")
     print("=" * 60)
     print()
 
@@ -80,18 +81,22 @@ def main():
     ]
     
     tts_choices = [
-        ("Kokoro - Local high-quality TTS via FastRTC (default)", "kokoro"),
-        ("Together AI - Together AI API", "together"),
-        ("Orpheus RunPod - Orpheus TTS via RunPod deployment", "orpheus-runpod"),
-        
+        ("MeloTTS - Alta calidad, funciona sin internet (RECOMENDADO)", "melo"),
+        ("OpenAI TTS - Calidad profesional (requiere API Key)", "openai"),
+        ("Google TTS - Voz basica en espanol, simple", "gtts"),
+        ("Edge TTS - Voz natural (requiere DNS estable, puede fallar)", "edge"),
+        ("MiniMax Speech 2.6 - Mejor calidad (requiere Together AI API)", "minimax"),
+        ("Kokoro - Local TTS en ingles", "kokoro"),
+        ("Together AI - Orpheus (ingles)", "together"),
     ]
     
     avatar_choices = [
+        ("Carmen - Asesora de deudas (default)", "carmen"),
         ("Leo", "leo"),
         ("Zac", "zac"),
         ("Dan", "dan"),
         ("Jess", "jess"),
-        ("Tara (default)", "tara"),
+        ("Tara", "tara"),
         ("Zoe", "zoe"),
         ("Mia", "mia"),
         ("Leah", "leah"),
@@ -103,19 +108,19 @@ def main():
             "stt_model",
             message="Select STT (Speech-to-Text) model",
             choices=stt_choices,
-            default="moonshine",
+            default="whisper-groq",
         ),
         inquirer.List(
             "tts_model",
             message="Select TTS (Text-to-Speech) model",
             choices=tts_choices,
-            default="kokoro",
+            default="melo",
         ),
         inquirer.List(
             "avatar",
             message="Select Avatar",
             choices=avatar_choices,
-            default="tara",
+            default="carmen",
         ),
     ]
     
@@ -140,16 +145,9 @@ def main():
     print("=" * 60)
     print()
 
-    # Initialize the property search service
-    print("📚 Loading property database...")
-    try:
-        property_search_service = get_property_search_service()
-        property_search_service.ingest_properties("./data/properties.csv")
-        print_success("Property database loaded successfully")
-    except Exception as e:
-        print_error(f"Error loading property database: {e}")
-        sys.exit(1)
-    
+    # Para el MVP de SolucionaMiDeuda no necesitamos base de datos de propiedades
+    # Las herramientas de perfilado funcionan en memoria
+    print_info("Herramientas de perfilado de deudas cargadas")
     print()
 
     # Get the selected models
@@ -183,7 +181,7 @@ def main():
         agent = FastRTCAgent(
             stt_model=stt_model_instance,
             tts_model=tts_model_instance,
-            tools=[search_property_tool],
+            tools=[save_client_data, get_client_summary, finalize_profile],
             thread_id=str("gradio-application-" + str(uuid4())),
             avatar=avatar,
         )

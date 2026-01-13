@@ -1,0 +1,162 @@
+===============================================================================
+  🎓 ENGLISH TUTOR - QUICK START GUIDE
+===============================================================================
+
+WHAT IS THIS?
+-------------
+A complete AI-powered English tutoring system that runs 100% locally.
+Uses Ollama for LLM, local STT/TTS, and Gradio for the interface.
+
+FEATURES:
+---------
+✅ Personalized learning based on your skill level
+✅ Speaking practice with voice recognition
+✅ Grammar, vocabulary, and pronunciation exercises
+✅ Real-time feedback and progress tracking
+✅ Conversation practice with AI tutor
+✅ 100% local - no cloud dependencies (optional Groq for faster STT)
+
+REQUIREMENTS:
+------------
+- Python 3.11+
+- Ollama installed and running (ollama serve)
+- At least one Ollama model: llama3.2, qwen2.5, etc.
+- (Optional) Groq API key for cloud STT
+
+INSTALLATION (3 STEPS):
+----------------------
+
+Step 1: Generate Project
+------------------------
+From the root directory:
+
+    python setup_english_tutor_master.py
+
+This creates the entire project structure automatically.
+
+
+Step 2: Configure
+-----------------
+    cd english_tutor
+    cp .env.example .env
+    
+Edit .env file:
+    - Set OLLAMA_MODEL to your preferred model (e.g., llama3.2)
+    - Add GROQ_API_KEY if using whisper-groq for STT
+    - Optionally set TTS_MODEL (kokoro is good for English)
+
+
+Step 3: Install & Run
+---------------------
+    pip install -e .
+    python scripts/run_tutor.py
+
+The app opens at http://localhost:7860
+
+
+USAGE:
+------
+Text Mode:
+  - Type your question or "give me an exercise"
+  - Get instant feedback from AI tutor
+
+Voice Mode:
+  - Click microphone, speak your answer
+  - Get audio response from tutor
+
+
+RECOMMENDED MODELS:
+-------------------
+Ollama LLM:
+  llama3.2      - Fast, good for beginners (3B)
+  qwen2.5       - Great for ESL teaching (3B)
+  llama3.1:8b   - Better reasoning (8B)
+
+STT (Speech Recognition):
+  whisper-groq      - Fast, cloud-based (needs API key)
+  moonshine         - Local, lightweight
+  faster-whisper    - Local, optimized
+
+TTS (Text-to-Speech):
+  kokoro            - Local English TTS (recommended)
+  together          - High quality (needs API key)
+  edge              - Free, internet required
+
+
+PROJECT STRUCTURE:
+------------------
+english_tutor/
+├── src/english_tutor/
+│   ├── agent/           # LangGraph tutor agent
+│   ├── competencies/    # Skill tracking
+│   ├── exercises/       # Exercise generator
+│   ├── models/          # STT/TTS integration
+│   ├── database/        # SQLite for progress
+│   └── ui/              # Gradio interface
+├── scripts/
+│   └── run_tutor.py     # Main entry point
+├── data/                # Student database
+└── .env                 # Configuration
+
+
+COMPETENCIES TRACKED:
+--------------------
+1. Grammar        - Tenses, structure, articles
+2. Vocabulary     - Words, synonyms, usage
+3. Pronunciation  - Phonetics, intonation
+4. Listening      - Audio comprehension
+5. Speaking       - Conversational fluency
+6. Writing        - Written expression
+
+
+TROUBLESHOOTING:
+---------------
+❌ "Ollama not running"
+   → Run: ollama serve
+
+❌ "No module named 'realtime_phone_agents'"
+   → The tutor imports STT/TTS from parent project
+   → Make sure you're in the right directory structure
+
+❌ "GROQ_API_KEY not found"
+   → Add your Groq API key to .env
+   → Or use local STT: STT_MODEL=moonshine
+
+❌ Port already in use
+   → Change SERVER_PORT in .env to 7861 or another port
+
+
+EXAMPLE COMMANDS:
+----------------
+Student: "Can we practice grammar?"
+Tutor:   "Let's practice present perfect tense! ..."
+
+Student: "I want to improve my vocabulary"
+Tutor:   "Great! Here's a word definition exercise..."
+
+Student: "What should I focus on?"
+Tutor:   "Let's focus on pronunciation. You'll improve quickly!"
+
+
+TIPS:
+-----
+💡 Save progress: Progress auto-saves to data/students.db
+💡 Multiple students: Just change DEFAULT_STUDENT_NAME in .env
+💡 Adjust difficulty: System adapts based on your responses
+💡 Use voice: Speaking practice is the fastest way to improve
+💡 Be consistent: Daily 10-minute sessions work best
+
+
+NEXT STEPS:
+----------
+1. Run the master setup script
+2. Configure your .env file
+3. Install dependencies
+4. Start learning!
+
+
+For detailed documentation, see: ENGLISH_TUTOR_README.md
+
+===============================================================================
+Happy Learning! 🎓🚀
+===============================================================================
