@@ -28,4 +28,4 @@ TELNYX__PHONE_NUMBER=+1234567890
 ## Resources
 
 -   **Telnyx Dashboard**: https://portal.telnyx.com
--   **Programmable Voice**: https://developers.telnyx.com/api/v2/programmable-voice
+-   **Programmable Voice**: https://developers.telnyx.com/api/v2/programmable-voice# Telnyx v2
