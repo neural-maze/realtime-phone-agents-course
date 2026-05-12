@@ -1,7 +1,6 @@
 from fastrtc import Stream
 from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
-from loguru import logger
 from typing import Any, Callable, Literal
 from gradio.components.base import Component
 from fastrtc.tracks import HandlerType
@@ -9,7 +8,6 @@ from fastrtc.utils import RTCConfigurationCallable
 
 
 class VoiceAgentStream(Stream):
-    
     def __init__(
         self,
         handler: HandlerType,
@@ -70,7 +68,7 @@ class VoiceAgentStream(Stream):
 
     async def handle_incoming_call(self, request: Request):
         """
-        Handle incoming telephone calls (e.g., via Twilio).
+        Handle incoming telephone calls.
 
         Generates TwiML instructions to connect the incoming call to the
         WebSocket handler (`/telephone/handler`) for audio streaming.
@@ -86,10 +84,10 @@ class VoiceAgentStream(Stream):
         response = VoiceResponse()
         response.say("Connecting to the AI assistant.")
         connect = Connect()
-        
+
         # Get hostname from X-Forwarded-Host header (if behind proxy) or fallback to request hostname
         hostname = request.headers.get("x-forwarded-host", request.url.hostname)
-        
+
         path = request.url.path.removesuffix("/telephone/incoming")
         connect.stream(url=f"wss://{hostname}{path}/telephone/handler")
         response.append(connect)
