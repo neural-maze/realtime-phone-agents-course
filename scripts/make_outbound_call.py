@@ -1,5 +1,5 @@
 """
-Interactive application to make outbound calls using the Twilio integration.
+Interactive application to make outbound calls using the configured telephony provider.
 
 This script provides a user-friendly interface to initiate calls through the API.
 """
@@ -111,13 +111,13 @@ def make_call(
     Initiate an outbound call through the API.
 
     Args:
-        from_number: Twilio phone number to call from
+        from_number: Provider phone number to call from
         to_number: Phone number to call to
         voice_agent_url: URL of the voice agent to connect to
         api_base_url: Base URL of the API
 
     Returns:
-        Response dictionary containing the call SID
+        Response dictionary containing the provider call identifier
 
     Raises:
         requests.exceptions.RequestException: If the API call fails
@@ -147,7 +147,7 @@ def confirm_details(from_number: str, to_number: str, voice_agent_url: str) -> b
     Ask user to confirm the call details.
 
     Args:
-        from_number: Twilio phone number
+        from_number: Provider phone number
         to_number: Recipient phone number
         voice_agent_url: Voice agent URL
 
@@ -155,7 +155,7 @@ def confirm_details(from_number: str, to_number: str, voice_agent_url: str) -> b
         True if user confirms, False otherwise
     """
     print_section_header("📋 CONFIRM CALL DETAILS")
-    print(f"   From (Twilio):    {from_number}")
+    print(f"   From (Provider):  {from_number}")
     print(f"   To (Recipient):   {to_number}")
     print(f"   Voice Agent URL:  {voice_agent_url}")
     print()
@@ -178,12 +178,14 @@ def main():
 
     print("Welcome! Let's set up your outbound call.\n")
     print("ℹ️  Phone numbers should be in E.164 format (e.g., +1234567890)")
-    print("ℹ️  Voice agent URL should be publicly accessible (e.g., via ngrok, Runpod, etc.)\n")
+    print(
+        "ℹ️  Voice agent URL should be publicly accessible (e.g., via ngrok, Runpod, etc.)\n"
+    )
 
-    # Step 1: Get Twilio number
-    print_section_header("STEP 1: Twilio Phone Number")
+    # Step 1: Get provider number
+    print_section_header("STEP 1: Provider Phone Number")
     from_number = get_input(
-        "Enter your Twilio phone number (the number to call FROM)",
+        "Enter your provider phone number (the number to call FROM)",
         example="+11234567890",
         validator=validate_phone_number,
     )
@@ -214,10 +216,12 @@ def main():
 
     try:
         result = make_call(from_number, to_number, voice_agent_url)
-        call_sid = result.get("sid", "Unknown")
+        call_id = result.get("call_id") or result.get("sid", "Unknown")
+        provider = result.get("provider", "configured provider")
 
         print("   ✅ SUCCESS! Call initiated successfully!\n")
-        print(f"   📌 Call SID: {call_sid}")
+        print(f"   📌 Provider: {provider}")
+        print(f"   📌 Call ID: {call_id}")
         print(f"   📱 The phone at {to_number} should be ringing now...\n")
         print("╔═══════════════════════════════════════════════════════════╗")
         print("║  Your call is connecting! Check your phone.              ║")
@@ -225,11 +229,11 @@ def main():
         return 0
 
     except Exception as e:
-        print(f"   ❌ ERROR: Failed to initiate call\n")
+        print("   ❌ ERROR: Failed to initiate call\n")
         print(f"   Details: {str(e)}\n")
         print("   Troubleshooting tips:")
         print("   • Make sure your API is running (http://localhost:8000)")
-        print("   • Verify your Twilio credentials in the .env file")
+        print("   • Verify your telephony provider credentials in the .env file")
         print("   • Check that the voice agent URL is publicly accessible")
         print("   • Ensure phone numbers are in E.164 format\n")
         return 1
@@ -241,4 +245,3 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n\n❌ Cancelled by user.\n")
         sys.exit(0)
-

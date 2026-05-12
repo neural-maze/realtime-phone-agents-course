@@ -1,6 +1,6 @@
 <div align="center">
   <h1>☎️ Phone Calling Agents Course ☎️</h1>
-  <h3>How to build an Agent Call Center using FastRTC, Superlinked, Twilio, Opik & RunPod</h3>
+  <h3>How to build an Agent Call Center using FastRTC, Superlinked, Twilio or Telnyx, Opik & RunPod</h3>
 </div>
 
 </br>
@@ -35,8 +35,8 @@ Instead, we're building a **real estate company**, but with a twist … the empl
 
 By the end of this course, you'll have a system capable of:
 
-* ☎️ Receive inbound calls with Twilio
-* 📞 Make outbound calls through Twilio
+* ☎️ Receive inbound calls with Twilio or Telnyx
+* 📞 Make outbound calls through Twilio or Telnyx
 * 🏠 Search live property data using Superlinked
 * ⚡ Run realtime conversations powered by FastRTC
 * 🗣️ Transcribe speech instantly with Moonshine + Fast Whisper
@@ -154,7 +154,7 @@ This lesson sets the foundation for everything that follows!
     <img src="static/diagrams/diagram_lesson_1.png" alt="Lesson 1 Diagram" width="800">
 </p>
 
-**Goal**: Build your first working voice agent using FastRTC and integrate it with Twilio.
+**Goal**: Build your first working voice agent using FastRTC and integrate it with a telephony provider.
 
 ### Steps:
 
@@ -199,11 +199,11 @@ Or manually:
 ngrok http 8000
 ```
 
-**Step 3**: Connect to Twilio
+**Step 3**: Connect to a telephony provider
 
 Follow the instructions in the [article](https://theneuralmaze.substack.com/p/building-realtime-voice-agents-with) to:
-- Configure your Twilio account
-- Connect your ngrok URL to Twilio
+- Configure your Twilio or Telnyx account
+- Connect your ngrok URL to the provider
 - Start receiving real phone calls!
 
 ---
@@ -375,7 +375,7 @@ Follow the instructions in the [article](https://theneuralmaze.substack.com/p/bu
    > ⚠️ **IMPORTANT**: Make sure your `.env` file includes all required variables from [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md), including:
    > - Opik API key for tracing
    > - Qdrant Cloud credentials
-   > - Twilio credentials
+   > - Twilio or Telnyx credentials
    > - Runpod API key
    > - All STT/TTS model configurations
 
@@ -398,9 +398,9 @@ Follow the instructions in the [article](https://theneuralmaze.substack.com/p/bu
 
    This populates your Qdrant Cloud cluster with property data for the agent to search.
 
-   **Step 3: Configure Twilio**
+   **Step 3: Configure Telephony**
 
-   - Go to your Twilio TwiML App
+   - Go to your Twilio TwiML App or Telnyx TeXML Application
    - Replace your ngrok URL with your Runpod URL:
      ```
      https://your-pod-id.proxy.runpod.net/voice/telephone/incoming
@@ -409,7 +409,7 @@ Follow the instructions in the [article](https://theneuralmaze.substack.com/p/bu
 
    **Step 4: Test Inbound Calls**
 
-   Call your Twilio number and interact with your deployed agent! The system will:
+   Call your provider number and interact with your deployed agent! The system will:
    - Answer with the avatar you configured (`AVATAR_NAME` in `.env`)
    - Search properties using Superlinked
    - Trace every interaction in Opik

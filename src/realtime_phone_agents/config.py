@@ -1,4 +1,4 @@
-from typing import ClassVar
+from typing import ClassVar, Literal
 
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -112,6 +112,23 @@ class TwilioSettings(BaseModel):
     auth_token: str = Field(default="", description="Twilio Auth Token")
 
 
+# --- Telnyx Configuration ---
+class TelnyxSettings(BaseModel):
+    api_key: str = Field(default="", description="Telnyx API key")
+    account_sid: str = Field(default="", description="Telnyx account SID")
+    application_sid: str = Field(default="", description="Telnyx TeXML application SID")
+    webhook_path: str = Field(
+        default="/call/telnyx/events", description="Local Telnyx event webhook path"
+    )
+
+
+# --- Telephony Configuration ---
+class TelephonySettings(BaseModel):
+    provider: Literal["twilio", "telnyx"] = Field(
+        default="twilio", description="Telephony provider for outbound calls"
+    )
+
+
 # --- Settings Configuration ---
 class Settings(BaseSettings):
     groq: GroqSettings = Field(default_factory=GroqSettings)
@@ -124,6 +141,8 @@ class Settings(BaseSettings):
     together: TogetherTTSSettings = Field(default_factory=TogetherTTSSettings)
     opik: OpikSettings = Field(default_factory=OpikSettings)
     twilio: TwilioSettings = Field(default_factory=TwilioSettings)
+    telnyx: TelnyxSettings = Field(default_factory=TelnyxSettings)
+    telephony: TelephonySettings = Field(default_factory=TelephonySettings)
 
     stt_model: str = Field(
         default="whisper-groq",

@@ -40,7 +40,7 @@ app.include_router(health.router)
 app.include_router(superlinked.router)
 app.include_router(voice.router)
 
-# Mount voice stream for Twilio integration
+# Mount voice stream for telephone integrations
 mount_voice_stream(app)
 
 

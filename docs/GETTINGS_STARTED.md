@@ -133,19 +133,41 @@ TWILIO__ACCOUNT_SID=YOUR_TWILIO_ACCOUNT_SID
 TWILIO__AUTH_TOKEN=YOUR_TWILIO_AUTH_TOKEN
 ```
 
+Leave `TELEPHONY__PROVIDER=twilio` when you want outbound calls to use Twilio.
 
-# 5. Twilio 
+### Telnyx
 
-You can hook up a Stream to a SIP provider like Twilio, which lets you give your app its own phone number.
+For Telnyx, create a TeXML Application and add the Telnyx credentials to your `.env` file:
+
+```
+TELEPHONY__PROVIDER=telnyx
+TELNYX__API_KEY=YOUR_TELNYX_API_KEY
+TELNYX__ACCOUNT_SID=YOUR_TELNYX_ACCOUNT_SID
+TELNYX__APPLICATION_SID=YOUR_TELNYX_TEXML_APPLICATION_SID
+TELNYX__WEBHOOK_PATH=/call/telnyx/events
+```
+
+The Telnyx outbound path uses the TeXML REST API and points Telnyx at:
+
+```
+https://your-public-url/voice/telephone/incoming
+```
+
+That endpoint returns the existing `<Connect><Stream>` instructions used by the FastRTC telephone handler.
+
+
+# 5. Telephony
+
+You can hook up a Stream to a provider like Twilio or Telnyx, which lets you give your app its own phone number.
 
 [Sign up on Twilio](https://www.twilio.com/) and buy a phone number with voice support. If you’re on a trial account, you'll receive a free phone number (that's what we've done for our experiments).
 
-Don't worry about creating TwiML Apps, or enabling the connection between Twilio and our API, as we will cover that in detail as part of the course.
+For Telnyx, create a TeXML Application and set its XML request URL to your public `/voice/telephone/incoming` endpoint.
 
 
 # 6. Ngrok
 
-For local development, you’ll need a public HTTPS URL so Twilio can reach your API. Since your FastAPI server is running on your machine, Twilio can't access it directly — which is why we use [ngrok](https://ngrok.com/).
+For local development, you’ll need a public HTTPS URL so your provider can reach your API. Since your FastAPI server is running on your machine, providers can't access it directly, which is why we use [ngrok](https://ngrok.com/).
 
 Go to [ngrok's website](https://ngrok.com/), sign up, and grab your auth token. You'll need it to run ngrok without restrictions.
 
