@@ -499,3 +499,77 @@ Follow the instructions in the [article](https://theneuralmaze.substack.com/p/bu
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+## ❓ FAQ
+
+### What is Phone Calling Agents Course?
+
+**Phone Calling Agents Course** is a comprehensive course that teaches you how to build a production-ready Agent Call Center using FastRTC, Superlinked, Twilio, Opik, and RunPod. The course walks you through building a real estate company with **realtime voice agents** as employees!
+
+### What You Will Learn
+
+| Capability | Technology |
+|------------|------------|
+| ☎️ Receive inbound calls | Twilio |
+| 📞 Make outbound calls | Twilio |
+| 🏠 Search live property data | Superlinked |
+| ⚡ Realtime conversations | FastRTC |
+| 🗣️ Speech-to-Text | Moonshine + Fast Whisper |
+| 🎙️ Text-to-Speech | Kokoro + Orpheus 3B |
+| 🚀 GPU deployment | RunPod |
+| 📊 Tracing & monitoring | Opik |
+
+### Course Structure (5 Lessons)
+
+| Lesson | Topic | Focus |
+|--------|-------|-------|
+| **Lesson 0** | Project Overview & Architecture | Big picture system design |
+| **Lesson 1** | FastRTC Voice Agents | Build realtime voice agent + Twilio |
+| **Lesson 2** | Superlinked Search | Multi-attribute property search |
+| **Lesson 3** | STT/TTS Systems | Improve transcription & synthesis |
+| **Lesson 4** | Multi-avatar Deployment | Production call center with tracing |
+
+### Tech Stack
+
+| Technology | Description |
+|------------|-------------|
+| **FastRTC** | Python library for real-time communication |
+| **Superlinked** | Framework for high-performance search combining structured + unstructured data |
+| **RunPod** | End-to-end AI cloud for model deployment |
+| **Opik** | LLM tracing, evaluation, and monitoring |
+| **Twilio** | Cloud communications platform for voice/video/text APIs |
+
+### Requirements
+
+- Python environment (follow `docs/GETTINGS_STARTED.md`)
+- Twilio account (for phone calls)
+- RunPod account (for GPU deployment)
+- Opik API key (for tracing)
+- Qdrant Cloud credentials (for vector storage)
+- OpenAI/Together AI API keys (for LLM)
+
+### How to Run?
+
+**Quick Demo (Gradio):**
+```bash
+make start-gradio-application
+```
+
+**Production Call Center:**
+```bash
+make start-call-center
+make start-ngrok-tunnel
+```
+
+### License
+
+**MIT License** - See [LICENSE](LICENSE) file for details.
+
+### Help Resources
+
+- 📰 [The Neural Maze Newsletter](https://theneuralmaze.substack.com/)
+- 🎥 [YouTube Channel](https://www.youtube.com/@jesuscopado-en)
+- 📋 [GitHub Issues](https://github.com/neural-maze/realtime-phone-agents-course/issues)
+- 📖 [Getting Started Guide](docs/GETTINGS_STARTED.md)
+
