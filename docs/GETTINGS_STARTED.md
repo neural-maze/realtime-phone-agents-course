@@ -73,6 +73,26 @@ To leverage Superlinked's natural queries, we'll make use of OpenAI models (in p
 
 Simply add your OpenAI API Key to the `OPENAI__API_KEY` var in your `.env` file.
 
+### Public neighborhood web search
+
+Default voice agents can search for current neighborhood amenities and transport,
+and read source pages with [Parallel Search MCP](https://docs.parallel.ai/integrations/mcp/search-mcp).
+Search uses Fast mode. No Parallel account or API key is needed. For example,
+ask "What metro lines serve Barrio de Salamanca?". Property details, prices and
+availability still come from the Superlinked property database.
+
+Web queries and requested source URLs are sent to `https://search.parallel.ai/mcp`.
+Set `WEB_SEARCH_ENABLED=false` in `.env` to remove both web tools from default
+agents. An explicit `FastRTCAgent(tools=[...])` list is used as supplied, and
+`tools=[]` disables all tools. Existing model, property database and voice
+credentials keep their current roles.
+
+Each agent conversation thread uses its own opaque search identifier, reused
+for follow-up searches and page reads. Use a new `thread_id` (or call
+`set_thread_id` with a new value) for a new conversation. Requests time out after
+fifteen seconds; service errors are returned to the agent so it can explain
+that it could not verify the information. Anonymous service limits apply.
+
 
 ### Together AI (for using Orpheus 3B through Together)
 
