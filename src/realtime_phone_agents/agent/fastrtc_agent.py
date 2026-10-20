@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import numpy as np
 import opik
-from fastrtc import ReplyOnPause, Stream
+from fastrtc import ReplyOnPause, Stream, get_current_context
 from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 from langgraph.checkpoint.memory import InMemorySaver
@@ -76,7 +76,7 @@ class FastRTCAgent:
         self._voice_effect = voice_effect or get_sound_effect()
 
         self._avatar = get_avatar(avatar)
-        self._parallel_session_ids: dict[str, str] = {}
+        self._parallel_session_ids: dict[tuple[str, str | None], str] = {}
 
         # Create the React agent directly inside the class
         self._react_agent = self._create_react_agent(
@@ -211,11 +211,16 @@ class FastRTCAgent:
             Audio chunks for tool use messages and effects
         """
         final_text: str | None = None
-        # The agent thread owns the opaque MCP identity, not a tool/HTTP client.
-        # Capture both before awaiting so interleaved threads cannot exchange IDs.
+        # A mounted agent is shared across calls. FastRTC supplies the connection
+        # ID (Twilio streamSid for phone calls) through a task-local context.
+        # Outside FastRTC, the explicit thread identifies a programmatic chat.
         thread_id = self._thread_id
+        try:
+            connection_id = get_current_context().webrtc_id
+        except RuntimeError:  # No FastRTC context during programmatic use.
+            connection_id = None
         parallel_session_id = self._parallel_session_ids.setdefault(
-            thread_id, str(uuid4())
+            (thread_id, connection_id), str(uuid4())
         )
         
         # Stream LangChain agent updates with Opik tracing

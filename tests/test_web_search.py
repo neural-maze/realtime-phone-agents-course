@@ -4,10 +4,13 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 from uuid import UUID
 
 import httpx
+from fastrtc.utils import current_context
+from fastrtc.websocket import WebSocketHandler
 from langchain_core.messages import ToolMessage
 from runtime_support import ScriptedModel, load_runtime
 
@@ -147,6 +150,43 @@ class WebSearchTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(chunks[0], "Let me look for that in the system")
         self.assertIn("Line four", chunks[-1])
         self.assertIn("https://www.metromadrid.es/en", chunks[-1])
+
+    async def test_mounted_stream_uses_real_fastrtc_connection_context(self):
+        agent, model = self.agent()
+
+        async def connection_turn(connection_id):
+            handler = WebSocketHandler.__new__(WebSocketHandler)
+            handler.stream_id = connection_id
+            handler.websocket = None
+            handler.stream_handler = SimpleNamespace(
+                emit=lambda: agent.stream["handler"]((16000, None))
+            )
+            token = current_context.set(None)
+            try:
+                # Execute FastRTC's real context boundary and the same closure
+                # shared by the FastAPI phone mount, without live audio I/O.
+                return [chunk async for chunk in handler.emit_with_context()]
+            finally:
+                current_context.reset(token)
+
+        await asyncio.gather(
+            connection_turn("twilio-call-a"), connection_turn("twilio-call-b")
+        )
+        first_ids = [c["arguments"]["session_id"] for c in self.server.calls]
+        self.assertEqual(len(set(first_ids)), 2)
+        self.assertTrue(
+            all(value not in ("twilio-call-a", "twilio-call-b") for value in first_ids)
+        )
+        model.operation = "web_fetch"
+        model.arguments = {"urls": ["https://www.metromadrid.es/en"]}
+        await connection_turn("twilio-call-a")
+        await connection_turn("twilio-call-b")
+        self.assertEqual(
+            [c["arguments"]["session_id"] for c in self.server.calls[2:]], first_ids
+        )
+        agent.set_thread_id("new-chat-within-connection")
+        await connection_turn("twilio-call-a")
+        self.assertNotIn(self.server.calls[-1]["arguments"]["session_id"], first_ids)
 
     async def turn(self, agent):
         return [

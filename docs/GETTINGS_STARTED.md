@@ -87,8 +87,9 @@ agents. An explicit `FastRTCAgent(tools=[...])` list is used as supplied, and
 `tools=[]` disables all tools. Existing model, property database and voice
 credentials keep their current roles.
 
-Each agent conversation thread uses its own opaque search identifier, reused
-for follow-up searches and page reads. Use a new `thread_id` (or call
+Each FastRTC connection uses its own opaque search identifier, reused for
+follow-up searches and page reads, even when calls share a mounted agent.
+For programmatic chats outside FastRTC, use a new `thread_id` (or call
 `set_thread_id` with a new value) for a new conversation. Requests time out after
 fifteen seconds; service errors are returned to the agent so it can explain
 that it could not verify the information. Anonymous service limits apply.

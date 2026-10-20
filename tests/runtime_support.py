@@ -30,7 +30,6 @@ def module(name, **attrs):
 def load_runtime():
     package = module("realtime_phone_agents")
     package.__path__ = [str(ROOT)]
-    module("fastrtc", ReplyOnPause=lambda handler: handler, Stream=object)
     module("realtime_phone_agents.agent.stream", VoiceAgentStream=lambda **kw: kw)
     module(
         "opik",
@@ -67,7 +66,11 @@ def load_runtime():
         "realtime_phone_agents.infrastructure.superlinked.service",
         get_property_search_service=lambda: service,
     )
-    return importlib.import_module("realtime_phone_agents.agent.fastrtc_agent")
+    runtime = importlib.import_module("realtime_phone_agents.agent.fastrtc_agent")
+    # Keep FastRTC's real task-local connection context, but avoid constructing a
+    # VAD/audio handler. The production stream closure still executes unchanged.
+    runtime.ReplyOnPause = lambda handler: handler
+    return runtime
 
 
 class ScriptedModel(BaseChatModel):
