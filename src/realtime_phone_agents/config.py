@@ -114,6 +114,10 @@ class TwilioSettings(BaseModel):
 
 # --- Settings Configuration ---
 class Settings(BaseSettings):
+    web_search_enabled: bool = Field(
+        default=True,
+        description="Allow default agents to search public web sources with Parallel MCP",
+    )
     groq: GroqSettings = Field(default_factory=GroqSettings)
     openai: OpenAISettings = Field(default_factory=OpenAISettings)
     superlinked: SuperlinkedSettings = Field(default_factory=SuperlinkedSettings)

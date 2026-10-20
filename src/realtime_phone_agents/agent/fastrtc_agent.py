@@ -1,23 +1,29 @@
 from typing import AsyncIterator, List, Optional, Tuple
+from uuid import uuid4
 
 import numpy as np
-from fastrtc import ReplyOnPause, Stream
-from realtime_phone_agents.agent.stream import VoiceAgentStream
+import opik
+from fastrtc import ReplyOnPause, Stream, get_current_context
 from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 from langgraph.checkpoint.memory import InMemorySaver
 from loguru import logger
-from opik.integrations.langchain import OpikTracer
 from opik import opik_context
-import opik
+from opik.integrations.langchain import OpikTracer
 
+from realtime_phone_agents.agent.stream import VoiceAgentStream
 from realtime_phone_agents.agent.tools.property_search import search_property_tool
+from realtime_phone_agents.agent.tools.web_search import (
+    WEB_SEARCH_INSTRUCTIONS,
+    web_fetch,
+    web_search,
+)
 from realtime_phone_agents.agent.utils import model_has_tool_calls
+from realtime_phone_agents.avatars.registry import get_avatar
 from realtime_phone_agents.background_effects import get_sound_effect
 from realtime_phone_agents.config import settings
 from realtime_phone_agents.stt import get_stt_model
 from realtime_phone_agents.tts import get_tts_model
-from realtime_phone_agents.avatars.registry import get_avatar
 
 AudioChunk = Tuple[int, np.ndarray]  # (sample_rate, samples)
 
@@ -55,7 +61,8 @@ class FastRTCAgent:
             thread_id: Thread ID for agent conversation tracking
             fallback_message: Message to return when no answer is found
             avatar: Avatar for the agent
-            tools: List of tools for the agent (defaults to property search tool)
+            tools: Explicit tool list, including [] to disable tools. When omitted,
+                use property search and, if enabled, public web search/fetch.
         """
         # Create Opik tracer for LangChain callbacks
         self._opik_tracer = OpikTracer(
@@ -69,6 +76,7 @@ class FastRTCAgent:
         self._voice_effect = voice_effect or get_sound_effect()
 
         self._avatar = get_avatar(avatar)
+        self._parallel_session_ids: dict[tuple[str, str | None], str] = {}
 
         # Create the React agent directly inside the class
         self._react_agent = self._create_react_agent(
@@ -95,7 +103,7 @@ class FastRTCAgent:
 
         Args:
             system_prompt: Custom system prompt (defaults to DEFAULT_SYSTEM_PROMPT)
-            tools: List of tools (defaults to [search_property_mock_tool])
+            tools: Explicit tool list, or None for the configured default tools.
 
         Returns:
             Configured LangChain agent
@@ -105,7 +113,12 @@ class FastRTCAgent:
             api_key=settings.groq.api_key,
         )
 
-        tools = tools or [search_property_tool]
+        if tools is None:
+            tools = [search_property_tool]
+            if settings.web_search_enabled:
+                tools.extend([web_search, web_fetch])
+        if web_search in tools or web_fetch in tools:
+            system_prompt = (system_prompt or "") + "\n\n" + WEB_SEARCH_INSTRUCTIONS
 
         agent = create_agent(
             llm,
@@ -198,12 +211,26 @@ class FastRTCAgent:
             Audio chunks for tool use messages and effects
         """
         final_text: str | None = None
+        # A mounted agent is shared across calls. FastRTC supplies the connection
+        # ID (Twilio streamSid for phone calls) through a task-local context.
+        # Outside FastRTC, the explicit thread identifies a programmatic chat.
+        thread_id = self._thread_id
+        try:
+            connection_id = get_current_context().webrtc_id
+        except RuntimeError:  # No FastRTC context during programmatic use.
+            connection_id = None
+        parallel_session_id = self._parallel_session_ids.setdefault(
+            (thread_id, connection_id), str(uuid4())
+        )
         
         # Stream LangChain agent updates with Opik tracing
         async for chunk in self._react_agent.astream(
             {"messages": [{"role": "user", "content": transcription}]},
             {
-                "configurable": {"thread_id": self._thread_id},
+                "configurable": {
+                    "thread_id": thread_id,
+                    "parallel_session_id": parallel_session_id,
+                },
                 "callbacks": [self._opik_tracer]
             },
             stream_mode="updates",
@@ -231,7 +258,7 @@ class FastRTCAgent:
 
         if final_text:
             opik_context.update_current_trace(
-                thread_id=self._thread_id,
+                thread_id=thread_id,
                 input={"transcription": transcription},
                 output={"final_text": final_text},
             )
